@@ -1,0 +1,33 @@
+//F is front, B is back, R is right, L is left, D is drive, S  is speed for these pin assignments
+#define FRD1 13
+#define FRD2 12
+#define FLD1 8
+#define FLD2 7
+#define BRD1 11
+#define BRD2 10
+#define BLD1 6
+#define BLD2 5
+#define S
+
+void driveForward()
+void driveBackwards()
+void strafeLeft()
+void strafeRight()
+void rotateCW()
+void rotateCCW()
+
+
+/*setup code:
+pinMode (FRD1, output)
+pinMode (FRD2, output)
+pinMode (BRD1, output)
+pinMode (BRD2, output)
+pinMode (FLD1, output)
+pinMode (FLD2, output)
+pinMode (BLD1, output)
+pinMode (BLD2, output)
+pinMode (S, output)'
+*/
+
+
+
