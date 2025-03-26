@@ -41,7 +41,11 @@ motorBackward(BRD1,BRD2);
 motorBackward(BLD1,BLD2);
 }
 void strafeLeft () {
-
+motorBackward(FLD1,FLD2);
+motorForward(FRD1,FRD2);
+motorBackward(BRD1,BRD2);
+motorForward(BLD1,BLD2);
+// check if it makes sense plss
 }
 void strafeRight () {
 
