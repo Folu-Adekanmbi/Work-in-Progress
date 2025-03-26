@@ -9,12 +9,20 @@
 #define BLD2 5
 #define S
 
-void driveForward()
-void driveBackwards()
-void strafeLeft()
-void strafeRight()
-void rotateCW()
-void rotateCCW()
+void motorForward (int m1, int m2) {
+
+}
+
+void motorBackward (int m1, int m2) {
+
+}
+
+void driveForward () {}
+void driveBackwards () {}
+void strafeLeft () {}
+void strafeRight () {}
+void rotateCW () {}
+void rotateCCW () {}
 
 
 /*setup code:
