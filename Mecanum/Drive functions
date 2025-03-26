@@ -10,15 +10,21 @@
 #define S
 
 void motorForward (int m1, int m2) {
+  digitalWrite(m1, HIGH);
+  digitalWrite(m2, LOW);
 
 }
 
 void motorBackward (int m1, int m2) {
-
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, HIGH)
 }
 
 void driveForward () {
-
+motorForward()
+motorForward()
+motorForward()
+motorForward()
 }
 void driveBackwards () {
 
