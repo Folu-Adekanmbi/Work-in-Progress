@@ -1,4 +1,4 @@
-//F is front, B is back, R is right, L is left, D is drive, S  is speed for these pin assignments
+//F is front, B is back, R is right, L is left, D is drive, S is speed for these pin assignments
 #define FRD1 13
 #define FRD2 12
 #define FLD1 8
@@ -12,25 +12,28 @@
 void motorForward (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
-
+// controlling speed with PWM
+analogWrite(enablePin, 125); 
 }
 
 void motorBackward (int m1, int m2) {
   digitalWrite(m1, LOW);
-  digitalWrite(m2, HIGH)
+  digitalWrite(m2, HIGH);
+// controlling speed
+analogWrite(enablePin, 125);
 }
 
 void driveForward () {
-motorForward(FRD1,FRD2)
-motorForward(FLD1,FLD2)
-motorForward(BRD1,BRD2)
-motorForward(BLD1,BLD2)
+motorForward(FRD1,FRD2);
+motorForward(FLD1,FLD2);
+motorForward(BRD1,BRD2);
+motorForward(BLD1,BLD2);
 }
 void driveBackwards () {
-motorBackward(FRD1,FRD2)
-motorBackward(FLD1,FLD2)
-motorBackward(BRD1,BRD2)
-motorBackward(BLD1,BLD2)
+motorBackward(FRD1,FRD2);
+motorBackward(FLD1,FLD2);
+motorBackward(BRD1,BRD2);
+motorBackward(BLD1,BLD2);
 }
 void strafeLeft () {
 
