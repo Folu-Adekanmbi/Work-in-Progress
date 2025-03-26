@@ -23,6 +23,11 @@ void motorBackward (int m1, int m2) {
 analogWrite(enablePin, 125);
 }
 
+void motorStop (int m1, int m2) {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, LOW);
+}
+
 void driveForward () {
 motorForward(FRD1,FRD2);
 motorForward(FLD1,FLD2);
