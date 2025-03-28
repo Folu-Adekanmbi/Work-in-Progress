@@ -70,7 +70,8 @@ motorForward(BRD1, BRD2);
 }
 
 
-/*setup code:
+
+void mecanumSetup() {
 pinMode (FRD1, output)
 pinMode (FRD2, output)
 pinMode (BRD1, output)
@@ -80,7 +81,7 @@ pinMode (FLD2, output)
 pinMode (BLD1, output)
 pinMode (BLD2, output)
 pinMode (S, output)'
-*/
+}
 
 
 
