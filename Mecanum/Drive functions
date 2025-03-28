@@ -16,6 +16,8 @@ void motorForward (int m1, int m2) {
 analogWrite(enablePin, 125); 
 }
 
+motorforward();
+
 void motorBackward (int m1, int m2) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
@@ -47,14 +49,26 @@ motorBackward(BRD1,BRD2);
 motorForward(BLD1,BLD2);
 // check if it makes sense plss
 }
+
 void strafeRight () {
-
+motorForward(FLD1, FLD2);
+motorBackward(FRD1, FRD2);
+motorForward(BRD1, BRD2);
+motorBackward(BLD1, BLD2);
 }
+
 void rotateCW () {
-
+motorForward(FLD1, FLD2);
+motorForward(BLD1, BLD2);
+motorBackward(FRD1, FRD2);
+motorBackward(BRD1, BRD2);
 }
-void rotateCCW () {
 
+void rotateCCW () {
+motorBackward(FLD1, FLD2);
+motorBackward(BLD1, BLD2);
+motorForward(FRD1, FRD2);
+motorForward(BRD1, BRD2);
 }
 
 
