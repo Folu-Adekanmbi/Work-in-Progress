@@ -16,8 +16,6 @@ void motorForward (int m1, int m2) {
 analogWrite(enablePin, 125); 
 }
 
-motorforward();
-
 void motorBackward (int m1, int m2) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
