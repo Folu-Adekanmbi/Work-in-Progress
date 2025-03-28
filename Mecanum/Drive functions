@@ -13,14 +13,14 @@ void motorForward (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
 // controlling speed with PWM
-analogWrite(enablePin, 125); 
+  analogWrite(enablePin, 125); 
 }
 
 void motorBackward (int m1, int m2) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
 // controlling speed
-analogWrite(enablePin, 125);
+  analogWrite(enablePin, 125);
 }
 
 void motorStop (int m1, int m2) {
