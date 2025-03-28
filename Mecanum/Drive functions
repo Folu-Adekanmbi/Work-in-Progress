@@ -7,20 +7,20 @@
 #define BRD2 10
 #define BLD1 6
 #define BLD2 5
-#define S
+#define S 
 
-void motorForward (int m1, int m2, int s) {
+void motorForward (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
 // controlling speed with PWM
-  analogWrite(s, 125); 
+  analogWrite(S, 125); 
 }
 
 void motorBackward (int m1, int m2) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
 // controlling speed
-  analogWrite(s, 125);
+  analogWrite(S, 125);
 }
 
 void motorStop (int m1, int m2) {
