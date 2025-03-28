@@ -9,14 +9,14 @@
 #define BLD2 5
 #define S 
 
-void motorForward (int m1, int m2) {
+void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
 // controlling speed with PWM
   analogWrite(S, 125); 
 }
 
-void motorBackward (int m1, int m2) {
+void motorCCW (int m1, int m2) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
 // controlling speed
@@ -29,10 +29,10 @@ void motorStop (int m1, int m2) {
 }
 
 void driveForward () {
-motorForward(FRD1,FRD2);
-motorForward(FLD1,FLD2);
-motorForward(BRD1,BRD2);
-motorForward(BLD1,BLD2);
+motorCW(FRD1,FRD2);
+motorCCW(FLD1,FLD2);
+motorCW(BRD1,BRD2);
+motorCCW(BLD1,BLD2);
 }
 void driveBackwards () {
 motorBackward(FRD1,FRD2);
