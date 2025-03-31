@@ -41,32 +41,32 @@ motorCCW(BRD1,BRD2);
 motorCW(BLD1,BLD2);
 }
 void strafeLeft () {
-motorBackward(FLD1,FLD2);
-motorForward(FRD1,FRD2);
-motorBackward(BRD1,BRD2);
-motorForward(BLD1,BLD2);
+motorCW(FRD1,FRD2);
+motorCCW(FLD1,FLD2);
+motorCCW(BRD1,BRD2);
+motorCW(BLD1,BLD2);
 // check if it makes sense plss
 }
 
 void strafeRight () {
-motorForward(FLD1, FLD2);
-motorBackward(FRD1, FRD2);
-motorForward(BRD1, BRD2);
-motorBackward(BLD1, BLD2);
+motorCCW(FRD1, FRD2);
+motorCW(FLD1, FLD2);
+motorCW(BRD1, BRD2);
+motorCCW(BLD1, BLD2);
 }
 
 void rotateCW () {
-motorForward(FLD1, FLD2);
-motorForward(BLD1, BLD2);
-motorBackward(FRD1, FRD2);
-motorBackward(BRD1, BRD2);
+motorCW(FRD1, FRD2);
+motorCW(FLD1, FLD2);
+motorCW(BRD1, BRD2);
+motorCW(BLD1, BLD2);
 }
 
 void rotateCCW () {
-motorBackward(FLD1, FLD2);
-motorBackward(BLD1, BLD2);
-motorForward(FRD1, FRD2);
-motorForward(BRD1, BRD2);
+motorCCW(FRD1, FRD2);
+motorCCW(FLD1, FLD2);
+motorCCW(BRD1, BRD2);
+motorCCW(BLD1, BLD2);
 }
 
 
