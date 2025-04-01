@@ -1,22 +1,47 @@
 #include "Tank.h"
+
+int fPins[] = {A2, A3, A4}; // Array of analog pins being used
+
+int baseThreshold = 950; // Adjusted accounting for weight plate, 950 is a placeholder
+int medThreshold = 800; // Defines line between light and medium, 800 is a placeholder
+int heavyThreshold = 750; // Defines line between medium and heavy, 750 is a placeholder
+
 void setup() {
   Serial.begin(9600); // Initializes serial communication
 }
 
 void loop() {
+  int fValues[3];
+  int fSum = 0;
+  float fAvg;
 
- int analogReading = analogRead(FORCE_SENSOR_PIN);
+  // Iterates through each force sensor to allow individual readings
+  for (int i = 0; i < 3; i++) {
+    fValues[i] = analogRead(fPins[i]);
+    Serial.print("Force Sensor ");
+    Serial.print(i + 1);
+    Serial.print(": ");
+    Serial.println(fValues[i]); // Prints each individual sensor's reading
+    fSum += fValues[i];
+  }
+ 
+  fAvg = fSum / 3.0; // Takes average of 3 sensor readings
+  Serial.print("Average: ");
+  Serial.println(fAvg); // Prints average of all 3 readings
 
-  Serial.print("Force sensor reading = ");
-  Serial.print(analogReading); // print the raw analog reading
-
-  if (analogReading < 10)       // 10 is a place holder need to test the analog read in class 
-    Serial.println("LIGHT");
-  else if (analogReading < 200) // 200 is a place holder
+  // Compares avg to different thresholds to determine weight of object on weight plate
+  if (fAvg < heavyThreshold) {
+    Serial.println("HEAVY"); 
+  } 
+  else if (fAvg < medThreshold) {
     Serial.println("MEDIUM");
-  else // any value greater than the 200 value would be Heavy 
-    Serial.println("HEAVY");
-  delay(1000);
-
+  }
+  else if (fAvg < baseThreshold) {
+    Serial.println("LIGHT"); 
+  }
+  else {
+    Serial.println("NOTHING");
+  }
+  delay (3000); // Gives 3 seconds to allow reading
 }
 
