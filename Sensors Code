@@ -1,1 +1,22 @@
+#include "Tank.h"
+void setup() {
+  Serial.begin(9600); // Initializes serial communication
+}
+
+void loop() {
+
+ int analogReading = analogRead(FORCE_SENSOR_PIN);
+
+  Serial.print("Force sensor reading = ");
+  Serial.print(analogReading); // print the raw analog reading
+
+  if (analogReading < 10)       // 10 is a place holder need to test the analog read in class 
+    Serial.println("LIGHT");
+  else if (analogReading < 200) // 200 is a place holder
+    Serial.println("MEDIUM");
+  else // any value greater than the 200 value would be Heavy 
+    Serial.println("HEAVY");
+  delay(1000);
+
+}
 
