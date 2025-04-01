@@ -42,5 +42,5 @@ void loop() {
   else {
     Serial.println("NOTHING");
   }
-  delay (3000); // Gives 3 seconds to allow reading
+  delay (1000); // Gives 1 second delay to allow reading
 }
