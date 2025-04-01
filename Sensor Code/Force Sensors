@@ -1,10 +1,8 @@
-#include "Tank.h"
+const int fPins[] = {A2, A3, A4}; // Array of analog pins being used
 
-int fPins[] = {A2, A3, A4}; // Array of analog pins being used
-
-int baseThreshold = 950; // Adjusted accounting for weight plate, 950 is a placeholder
-int medThreshold = 800; // Defines line between light and medium, 800 is a placeholder
-int heavyThreshold = 750; // Defines line between medium and heavy, 750 is a placeholder
+const int baseThreshold = 950; // Adjusted accounting for weight plate, 950 is a placeholder
+const int medThreshold = 800; // Defines line between light and medium, 800 is a placeholder
+const int heavyThreshold = 750; // Defines line between medium and heavy, 750 is a placeholder
 
 void setup() {
   Serial.begin(9600); // Initializes serial communication
