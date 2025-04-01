@@ -22,7 +22,9 @@ void loop() {
     Serial.println(fValues[i]); // Prints each individual sensor's reading
     fSum += fValues[i];
   }
- 
+
+  delay(500); // Short delay to allow reading
+  
   fAvg = fSum / 3.0; // Takes average of 3 sensor readings
   Serial.print("Average: ");
   Serial.println(fAvg); // Prints average of all 3 readings
@@ -41,5 +43,5 @@ void loop() {
     Serial.println("NOTHING");
   }
   
-  delay (1000); // Gives 1 second delay to allow reading
+  delay(500); // Short delay to allow reading
 }
