@@ -1,7 +1,7 @@
-int piezoPin = A5;
+const int piezoPin = A5;
 
-int plasticThreshold = 850; // Higher value for plastic due to stronger vibrations 850 is placeholder
-int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
+const int plasticThreshold = 850; // Higher value for plastic due to stronger vibrations 850 is placeholder
+const int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
 
 void setup() {
   Serial.begin(9600);
@@ -18,7 +18,8 @@ void loop() {
     Serial.println("FOAM");
   }
   else {
-    Serial.println("NOTHING";
+    Serial.println("NOTHING");
+  }
     
   delay(100); // Short delay to ensure multiple readings
 }
