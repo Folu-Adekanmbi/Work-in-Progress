@@ -1,0 +1,24 @@
+int piezoPin = A5;
+
+int plasticThreshold = 850; // Higher value for plastic due to stronger vibrations 850 is placeholder
+int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  int piezoValue = analogRead(piezoPin); // Piezo reads values from 512-1023
+
+  //Compares piezo reading to each threshold to determine material
+  if (piezoValue > plasticThreshold) {
+    Serial.println("PLASTIC");
+  } 
+  else if (piezoValue > foamThreshold) {
+    Serial.println("FOAM");
+  }
+  else {
+    Serial.println("NOTHING";
+    
+  delay(100); // Short delay to ensure multiple readings
+}
