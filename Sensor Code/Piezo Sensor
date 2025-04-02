@@ -23,3 +23,24 @@ void loop() {
     
   delay(100); // Short delay to ensure multiple readings
 }
+/*
+
+void setup() {
+    Serial.begin(115200);
+    ADCSRA = (ADCSRA & B11111000) | B00000010; // Set ADC prescaler to 16 (125 kHz ADC clock)
+}
+int n;
+int m = 0;
+void loop() {
+    int rawValue = analogRead(A0);
+    if(rawValue>n){
+      n = rawValue;
+    }
+    Serial.println(n); // Print raw data quickly
+  m++;
+  if(m >5000){
+    n=0;
+    m=0;
+  }
+}
+*/
