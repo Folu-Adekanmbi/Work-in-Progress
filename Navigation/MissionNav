@@ -8,7 +8,7 @@ void setup() {
     Enes100.println("Connected...");
 }
 
-void 
+void startOrientation(){}
 
 void loop() {
     float x, y, t; bool v; // Declare variables to hold the data
