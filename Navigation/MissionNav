@@ -1,5 +1,7 @@
 #include "Enes100.h"
 
+void startOrientation(){}
+
 void setup() {
     // Initialize Enes100 Library
     // Team Name, Mission Type, Marker ID, Room Number, Wifi Module TX Pin, Wifi Module RX Pin
@@ -7,8 +9,6 @@ void setup() {
     // At this point we know we are connected.
     Enes100.println("Connected...");
 }
-
-void startOrientation(){}
 
 void loop() {
     float x, y, t; bool v; // Declare variables to hold the data
