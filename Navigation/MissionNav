@@ -8,6 +8,8 @@ void setup() {
     Enes100.println("Connected...");
 }
 
+void 
+
 void loop() {
     float x, y, t; bool v; // Declare variables to hold the data
     //Enes100.getX will make sure you get the latest data available to you about your OTV's location.
