@@ -1,16 +1,17 @@
 #include "Enes100.h"
 
+// Orients otv to specified angle
 void correctOrientation(float ti, float tf){
 
 }
 
-//returns closest 90 degree multiple
+// Returns closest 90 degree multiple
 void quadAngle(float t) {
   int rounded = ((t + 45) / 90) * 90;
   return rounded % 360;
 }
 
-//drives and strafes specific amount
+// Drives and strafes specific amount
 void moveDirection(float drive, float strafe) {
   if (drive > 0) {
     driveForwards(drive);
@@ -26,7 +27,7 @@ void moveDirection(float drive, float strafe) {
   }
 }
 
-//moves to specific coordinate position
+// Moves to specific coordinate position
 void  moveHere(float xf, float yf) {
   if(Enes100.isVisible() == True) {
     float ti = Enes100.getTheta();
