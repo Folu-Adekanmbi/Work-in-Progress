@@ -31,26 +31,37 @@ void moveDirection(float drive, float strafe) {
 }
 
 //moves to specific coordinate position
-void  moveHere(float xf, float yf){
+void  moveHere(float xf, float yf) {
   if(Enes100.isVisible() == True) {
     float ti = Enes100.getTheta();
     float xi = Enes100.getX();
     float yi = Enes100.getY();
 
-    correctOrientation(quadAngle(float(ti)));
+    int angle = correctOrientation(quadAngle(float(ti)));
 
-    float dx = xf - xi
-    float dy = yf - yi
+    float dx = xf - xi;
+    float dy = yf - yi;
+    float drive = 0;
+    float strafe = 0;
     
-    switch (t){
+    switch (angle) {
       case 0:
-      break;
+        strafe = dx
+        drive = dy
+        break;
       case 90:
-      break;
+        strafe = -dy
+        drive = dx
+        break;
       case 180:
-      break;
+        strafe = -dx
+        drive = -dy
+        break;
       case 270:
-      break;
+        strafe = dy
+        drive = -dx
+        break;
+    }
   }
 }
 
