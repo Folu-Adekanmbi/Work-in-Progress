@@ -1,34 +1,30 @@
 #include "Enes100.h"
-#define kp
 
 // Orients otv to specified angle
-void correctOrientation(float ti, float tf){
-  float dt = tf - ti;
-  float pid_output = 0.0;
-  pid_output = kp * dt;
+void correctOrientation(float tf){
+  float ti = Enes100.getTheta();
+  float dt = (tf - ti + 360) % 360;
   
-}
+  if (dt == 0) {
+    motorStop();
+    return;
+  }
 
-// Returns closest 90 degree multiple
-void quadAngle(float t) {
-  int rounded = ((t + 45) / 90) * 90;
-  return rounded % 360;
-}
-
-// Drives and strafes specific amount
-void moveDirection(float drive, float strafe) {
-  if (drive > 0) {
-    driveForwards(drive);
+  if (dt <= 180) {  // Rotate clockwise
+    motorCW();
+    while ((ti - tf + 360) % 360 > 5) {
+      ti = Enes100.getTheta();
+      delay(100);
+    }
+  } 
+  else {  // Rotate clockwise
+    motorCCW();
+    while ((tf - ti + 360) % 360 > 5) {
+      ti = Enes100.getTheta();
+      delay(100);
+    }
   }
-  else if (drive < 0) {
-    driveBackwards(-drive);
-  }
-  if (strafe > 0) { 
-    strafeRight(strafe);
-  }
-  else if (strafe < 0) { 
-    strafeLeft(-strafe);
-  }
+  motorStop();  // Stop when angle is reached
 }
 
 // Moves to specific coordinate position
@@ -37,31 +33,80 @@ void  moveHere(float xf, float yf) {
   float xi = Enes100.getX();
   float yi = Enes100.getY();
 
-  int angle = correctOrientation(quadAngle(float(ti)));
+  int quadAngle = ((ti + 45) / 90) * 90) % 360; // Gets closest 90 degree multiple
+  correctOrientation(quadAngle);
 
-  float dx = xf - xi;
-  float dy = yf - yi;
-  float drive = 0;
-  float strafe = 0;
+  while (abs(xf - xi) > 0.5 || abs(yf - yi) > 0.5) {  // Continues looping until ideal coordinates are reached
+    xi = Enes100.getX();
+    yi = Enes100.getY();
+    switch (angle) {
+      case 0:  // Facing upwards
+        if (yi < yf) {
+          driveForwards();
+        }
+        else if (yi > yf) { 
+          driveBackwards();
+        }
+        if (xi < xf) {
+          strafeRight();
+        }
+        else if (xi > xf) {
+          strafeLeft();
+        }
+        break;
+
+      case 90:  // Facing right
+        if (xi < xf) {
+          driveForwards();
+        }
+        else if (xi > xf) {
+          driveBackwards();  
+        }
+        if (yi < yf) {
+          strafeLeft(); 
+        }
+        else if (yi > yf) {
+          strafeRight();  
+        }
+        break;
+
+      case 180:  // Facing downwards
+        if (yi > yf) {
+          driveForwards(); 
+        }
+        else if (yi < yf) {
+          driveBackwards();  
+        }
+        if (xi > xf) {
+          strafeRight();  
+        }
+        else if (xi < xf) {
+          strafeLeft();  
+        }
+        break;
+
+      case 270:  // Facing left
+        if (xi > xf) {
+          driveForwards(); 
+        }
+        else if (xi < xf) {
+          driveBackwards(); 
+        }
+        if (yi > yf) {
+          strafeLeft();  
+        }
+        else if (yi < yf) {
+          strafeRight(); 
+        }
+        break;
+    }
     
-  switch (angle) {
-    case 0:
-      strafe = dx
-      drive = dy
-      break;
-    case 90:
-      strafe = -dy
-      drive = dx
-      break;
-    case 180:
-      strafe = -dx
-      drive = -dy
-      break;
-    case 270:
-      strafe = dy
-      drive = -dx
-      break;
+    xi = Enes100.getX(); 
+    yi = Enes100.getY(); 
+
+    delay(100);  // Small delay to allow motors to react
   }
+  motorStop();
 }
 
 void setup() {
