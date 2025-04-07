@@ -28,7 +28,7 @@ void motorStop (int m1, int m2) {
   digitalWrite(m2, LOW);
 }
 
-void driveForward () {
+void driveForwards () {
 motorCW(FRD1,FRD2);
 motorCCW(FLD1,FLD2);
 motorCW(BRD1,BRD2);
