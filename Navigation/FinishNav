@@ -3,17 +3,15 @@ void correctOrientation(float tReal, float tIdeal){
 }
 
 void moveHere(float xi, float yi, float xf, float yf, float t){
-  if (t == 0){
-    
-  }
-  else if (t == 90){
-
-  }
-  else if (t == 180){
-
-  }
-  else if (t == 270){
-
+  switch (t){
+    case 0:
+    break;
+    case 90:
+    break;
+    case 180:
+    break;
+    case 270:
+    break;
   }
 }
   
