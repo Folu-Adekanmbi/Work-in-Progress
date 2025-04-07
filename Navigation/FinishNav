@@ -6,7 +6,7 @@ void correctOrientation(float tf){
   float dt = (tf - ti + 360) % 360;
   
   if (dt == 0) {
-    motorStop();
+    stopotv()
     return;
   }
 
