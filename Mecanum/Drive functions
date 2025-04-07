@@ -69,7 +69,12 @@ motorCCW(BRD1, BRD2);
 motorCCW(BLD1, BLD2);
 }
 
-
+void stopotv () {
+motorStop(FRD1, FRD2);
+motorStop(FLD1, FLD2);
+motorStop(BRD1, BRD2);
+motorStop(BLD1, BLD2);
+}
 
 void mecanumSetup() {
 pinMode (FRD1, output)
