@@ -29,43 +29,41 @@ void moveDirection(float drive, float strafe) {
 
 // Moves to specific coordinate position
 void  moveHere(float xf, float yf) {
-  if(Enes100.isVisible() == True) {
-    float ti = Enes100.getTheta();
-    float xi = Enes100.getX();
-    float yi = Enes100.getY();
+  float ti = Enes100.getTheta();
+  float xi = Enes100.getX();
+  float yi = Enes100.getY();
 
-    int angle = correctOrientation(quadAngle(float(ti)));
+  int angle = correctOrientation(quadAngle(float(ti)));
 
-    float dx = xf - xi;
-    float dy = yf - yi;
-    float drive = 0;
-    float strafe = 0;
+  float dx = xf - xi;
+  float dy = yf - yi;
+  float drive = 0;
+  float strafe = 0;
     
-    switch (angle) {
-      case 0:
-        strafe = dx
-        drive = dy
-        break;
-      case 90:
-        strafe = -dy
-        drive = dx
-        break;
-      case 180:
-        strafe = -dx
-        drive = -dy
-        break;
-      case 270:
-        strafe = dy
-        drive = -dx
-        break;
-    }
+  switch (angle) {
+    case 0:
+      strafe = dx
+      drive = dy
+      break;
+    case 90:
+      strafe = -dy
+      drive = dx
+      break;
+    case 180:
+      strafe = -dx
+      drive = -dy
+      break;
+    case 270:
+      strafe = dy
+      drive = -dx
+      break;
   }
 }
 
 void setup() {
     // Initialize Enes100 Library
     // Team Name, Mission Type, Marker ID, Room Number, Wifi Module TX Pin, Wifi Module RX Pin
-    Enes100.begin("Work in Progress", MATERIAL, 205, 1116, 3, 2);
+    Enes100.begin("Work in Progress", MATERIAL, 77, 1116, 3, 2);
     // At this point we know we are connected.
     Enes100.println("Connected...");
 }
