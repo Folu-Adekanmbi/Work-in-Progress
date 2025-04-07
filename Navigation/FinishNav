@@ -1,8 +1,12 @@
 #include "Enes100.h"
+#define kp
 
 // Orients otv to specified angle
 void correctOrientation(float ti, float tf){
-
+  float dt = tf - ti;
+  float pid_output = 0.0;
+  pid_output = kp * dt;
+  
 }
 
 // Returns closest 90 degree multiple
