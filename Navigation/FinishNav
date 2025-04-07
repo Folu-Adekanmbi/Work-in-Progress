@@ -1,9 +1,5 @@
 #include "Enes100.h"
 
-void startOrientation(float xi, float yi, float tf){
-
-}
-
 void correctOrientation(float ti, float tf){
 
 }
