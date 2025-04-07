@@ -1,18 +1,86 @@
-void correctOrientation(float tReal, float tIdeal){
+#include "Enes100.h"
+
+void startOrientation(float xi, float yi, float tf){
 
 }
 
-void moveHere(float xi, float yi, float xf, float yf, float t){
-  switch (t){
-    case 0:
-    break;
-    case 90:
-    break;
-    case 180:
-    break;
-    case 270:
-    break;
+void correctOrientation(float ti, float tf){
+
+}
+
+//returns closest 90 degree multiple
+void quadAngle(float t) {
+  int rounded = ((t + 45) / 90) * 90;
+  return rounded % 360;
+}
+
+//drives and strafes specific amount
+void moveDirection(float drive, float strafe) {
+  if (drive > 0) {
+    driveForwards(drive);
   }
+  else if (drive < 0) {
+    driveBackwards(-drive);
+  }
+  if (strafe > 0) { 
+    strafeRight(strafe);
+  }
+  else if (strafe < 0) { 
+    strafeLeft(-strafe);
+  }
+}
+
+//moves to specific coordinate position
+void  moveHere(float xf, float yf){
+  if(Enes100.isVisible() == True) {
+    float ti = Enes100.getTheta();
+    float xi = Enes100.getX();
+    float yi = Enes100.getY();
+
+    correctOrientation(quadAngle(float(ti)));
+
+    float dx = xf - xi
+    float dy = yf - yi
+    
+    switch (t){
+      case 0:
+      break;
+      case 90:
+      break;
+      case 180:
+      break;
+      case 270:
+      break;
+  }
+}
+
+void setup() {
+    // Initialize Enes100 Library
+    // Team Name, Mission Type, Marker ID, Room Number, Wifi Module TX Pin, Wifi Module RX Pin
+    Enes100.begin("Work in Progress", MATERIAL, 205, 1116, 3, 2);
+    // At this point we know we are connected.
+    Enes100.println("Connected...");
+}
+
+void loop() {
+    float x, y, t; bool v; // Declare variables to hold the data
+    //Enes100.getX will make sure you get the latest data available to you about your OTV's location.
+    //The first time getX is called, X, Y, theta and visibility are queried and cached.
+    //Subsequent calls return from the cache, so there is no performance gain to saving the function response to a variable.
+
+    x = Enes100.getX();  // Your X coordinate! 0-4, in meters, -1 if no aruco is not visibility (but you should use Enes100.isVisible to check that instead)
+    y = Enes100.getY();  // Your Y coordinate! 0-2, in meters, also -1 if your aruco is not visible.
+    t = Enes100.getTheta();  //Your theta! -pi to +pi, in radians, -1 if your aruco is not visible.
+    v = Enes100.isVisible(); // Is your aruco visible? True or False.
+
+    if (v) // If the ArUco marker is visible
+    {
+        Enes100.print(x); // print out the location
+        Enes100.print(",");
+        Enes100.print(y);
+        Enes100.print(",");
+        Enes100.println(t);
+    }
 }
   
   
