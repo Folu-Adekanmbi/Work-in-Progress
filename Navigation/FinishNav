@@ -11,14 +11,14 @@ void correctOrientation(float tf){
   }
 
   if (dt <= 180) {  // Rotate clockwise
-    motorCW();
+    rotateCW();
     while ((ti - tf + 360) % 360 > 5) {
       ti = Enes100.getTheta();
       delay(100);
     }
   } 
-  else {  // Rotate clockwise
-    motorCCW();
+  else {  // Rotate counter clockwise
+    rotateCCW();
     while ((tf - ti + 360) % 360 > 5) {
       ti = Enes100.getTheta();
       delay(100);
