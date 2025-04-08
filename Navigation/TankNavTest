@@ -1,5 +1,5 @@
 #include <Enes100.h>
-#include "Tank.h"
+#include <Tank.h>
 
 #define PIN_MOTOR_1_REVERSE 11 //FLD1
 #define PIN_MOTOR_1_FORWARD 10 //FLD2
@@ -10,63 +10,44 @@
 #define PIN_MOTOR_4_FORWARD 2 //BRD1
 #define PIN_MOTOR_4_REVERSE 3 //BRD2
 
-void startOrientation() {
-  float xi = Enes100.getX();
-  float yi = Enes100.getY();
-  float ti = Enes100.getTheta();
-  float vi = Enes100.isVisible();
-
-  if (x == 0.55 && y == 0.55) {
-    while (t != 1.57079632679) {
-      rotateCCW();
-      t = Enes100.getTheta();
-    }
-    driveForwards();
-    delay(7000);
-  } else if (x == 0.55 && y == 1.45) {
-    while (t != -1.57079632679) {
-      rotateCCW();
-      t = Enes100.getTheta();
-    }
-    driveForwards();
-    delay(7000);
-  }
-}
-
 // Orients otv to specified angle
 void correctOrientation(float tf){
   float ti = Enes100.getTheta();
-  float dt = ((tf - (ti + 2*PI)) % (2*PI));
+  float dt = fmod((tf - (ti + 2*PI)), 2*PI);
+  Enes100.print(dt);
 
   if (dt != 0 && dt <= PI) {  // Rotate clockwise
-    rotateCW();
-    while  (((tf - (ti + 2*PI)) % (2*PI)) > 0.1) {
+    while  (fmod((tf - (ti + 2*PI)), 2*PI) > 0.1) {
       ti = Enes100.getTheta();
-      delay(1)
+      rotateCW();
+      delay(1);
     }
   } 
   else {  // Rotate counter clockwise
+    Enes100.println("I am running! 2");
     rotateCCW();
-    while  (((tf - (ti + 2*PI)) % (2*PI)) > 0.1) {
+    while  (fmod((tf - (ti + 2*PI)), 2*PI) > 0.1) {
       ti = Enes100.getTheta();
-      delay(1)
+      rotateCCW();
+      delay(1);
     }
   }
-   stopotv()  // Stop when angle is reached
+   stopotv();  // Stop when angle is reached
 }
 
 void  moveHere(float xf, float yf) {
   float ti = Enes100.getTheta();
   float xi = Enes100.getX();
   float yi = Enes100.getY();
-
-  int quadAngle = ((ti + 2*PI + PI/4) / (PI/2)) * (PI/2)) % 2*PI; // Gets closest 90 degree multiple
+  float quadAngle = ((int)((2*ti)/PI)) *(PI/2);
+  Enes100.println(quadAngle);
   correctOrientation(quadAngle);
+  int quadAngle1 = (int) (quadAngle * (180/PI));
 
   while (abs(xf - xi) > 0.01 || abs(yf - yi) > 0.01) {  // Continues looping until ideal coordinates are reached
     xi = Enes100.getX();
     yi = Enes100.getY();
-    switch (angle) {
+    switch (quadAngle1) {
       case 0:  // Facing upwards
         if (yi < yf) {
           driveForwards();
@@ -82,7 +63,7 @@ void  moveHere(float xf, float yf) {
         }
         break;
 
-      case PI/4:  // Facing right
+      case 90:  // Facing right
         if (xi < xf) {
           driveForwards();
         }
@@ -97,7 +78,7 @@ void  moveHere(float xf, float yf) {
         }
         break;
 
-      case PI/2:  // Facing downwards
+      case 180:  // Facing downwards
         if (yi > yf) {
           driveForwards(); 
         }
@@ -112,7 +93,7 @@ void  moveHere(float xf, float yf) {
         }
         break;
 
-      case 3*PI/4:  // Facing left
+      case 270:  // Facing left
         if (xi > xf) {
           driveForwards(); 
         }
@@ -133,6 +114,7 @@ void  moveHere(float xf, float yf) {
 
     delay(1);  // Small delay to allow motors to react
   }
+  Enes100.println("I am not running! :( 2");
   stopotv();
 }
 
@@ -202,16 +184,14 @@ motorStop(PIN_MOTOR_2_FORWARD,PIN_MOTOR_2_REVERSE);
 
 
 void setup() {
-  Tank.begin(); // Must call in order to use any Tank function
-  // Initialize Enes100 Library
-  // Team Name, Mission Type, Marker ID, Room Number, Wifi Module TX Pin, Wifi Module RX Pin
-  Enes100.begin("Work in Progress", MATERIAL, 205, 1116, 3, 2);
-  // At this point we know we are connected.
-  Enes100.println("Connected...");
-  float x, y, t; bool v; // Declare variables to hold the data
+  Tank.begin();
+  Enes100.begin("Work in Progress", MATERIAL, 15, 1116, 52, 50);
+  delay(200);
+  Enes100.println("Successfully connected to the Vision System");
 }
 
 void loop() {
+  float x, y, t; bool v; // Declare variables to hold the data
   x = Enes100.getX();  // Your X coordinate! 0-4, in meters, -1 if no aruco is not visibility (but you should use Enes100.isVisible to check that instead)
   y = Enes100.getY();  // Your Y coordinate! 0-2, in meters, also -1 if your aruco is not visible.
   t = Enes100.getTheta();  //Your theta! -pi to +pi, in radians, -1 if your aruco is not visible.
@@ -219,16 +199,10 @@ void loop() {
 
   if (v) // If the ArUco marker is visible
     {
-        startOrientation();
-        Enes100.print(x); // print out the location
-        Enes100.print(",");
-        Enes100.print(y);
-        Enes100.print(",");
-        Enes100.println(t);
+        moveHere(1.0, 2.0);
     }
     else { // otherwise
         Enes100.println("Not visible"); // print not visible
     }
-  moveHere(1.0, 2.0)
 }
   
