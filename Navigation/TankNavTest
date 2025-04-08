@@ -10,7 +10,28 @@
 #define PIN_MOTOR_4_FORWARD 2 //BRD1
 #define PIN_MOTOR_4_REVERSE 3 //BRD2
 
-void startOrientation(){}
+void startOrientation() {
+  float xi = Enes100.getX();
+  float yi = Enes100.getY();
+  float ti = Enes100.getTheta();
+  float vi = Enes100.isVisible();
+
+  if (x == 0.55 && y == 0.55) {
+    while (t != 1.57079632679) {
+      rotateCCW();
+      t = Enes100.getTheta();
+    }
+    driveForward();
+    delay(7000);
+  } else if (x == 0.55 && y == 1.45) {
+    while (t != -1.57079632679) {
+      rotateCCW();
+      t = Enes100.getTheta();
+    }
+    driveForward();
+    delay(7000);
+  }
+}
 
 // Orients otv to specified angle
 void correctOrientation(float tf){
