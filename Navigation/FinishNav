@@ -31,7 +31,7 @@ void  moveHere(float xf, float yf) {
   int quadAngle = ((ti + 2*PI + PI/4) / (PI/2)) * (PI/2)) % 2*PI; // Gets closest 90 degree multiple
   correctOrientation(quadAngle);
 
-  while (abs(xf - xi) > 0. || abs(yf - yi) > 0.5) {  // Continues looping until ideal coordinates are reached
+  while (abs(xf - xi) > 0.01 || abs(yf - yi) > 0.01) {  // Continues looping until ideal coordinates are reached
     xi = Enes100.getX();
     yi = Enes100.getY();
     switch (angle) {
@@ -50,7 +50,7 @@ void  moveHere(float xf, float yf) {
         }
         break;
 
-      case 90:  // Facing right
+      case PI/4:  // Facing right
         if (xi < xf) {
           driveForwards();
         }
@@ -65,7 +65,7 @@ void  moveHere(float xf, float yf) {
         }
         break;
 
-      case 180:  // Facing downwards
+      case PI/2:  // Facing downwards
         if (yi > yf) {
           driveForwards(); 
         }
@@ -80,7 +80,7 @@ void  moveHere(float xf, float yf) {
         }
         break;
 
-      case 270:  // Facing left
+      case 3*PI/4:  // Facing left
         if (xi > xf) {
           driveForwards(); 
         }
@@ -99,9 +99,9 @@ void  moveHere(float xf, float yf) {
     xi = Enes100.getX(); 
     yi = Enes100.getY(); 
 
-    delay(100);  // Small delay to allow motors to react
+    delay(1);  // Small delay to allow motors to react
   }
-  motorStop();
+  stopotv();
 }
 
 void setup() {
