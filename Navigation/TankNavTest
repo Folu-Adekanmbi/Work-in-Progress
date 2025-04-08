@@ -1,6 +1,6 @@
 #include <Enes100.h>
-
 #include "Tank.h"
+
 #define PIN_MOTOR_1_REVERSE 11 //FLD1
 #define PIN_MOTOR_1_FORWARD 10 //FLD2
 #define PIN_MOTOR_2_REVERSE 9 //BLD1
@@ -9,6 +9,8 @@
 #define PIN_MOTOR_3_REVERSE 5 //FRD2
 #define PIN_MOTOR_4_FORWARD 2 //BRD1
 #define PIN_MOTOR_4_REVERSE 3 //BRD2
+
+void startOrientation(float xReal, float yReal, float tIdeal){}
 
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
