@@ -1,8 +1,6 @@
 #include "Enes100.h"
 
 void startOrientation(float xReal, float yReal, float tIdeal){}
-void correctOrientation(float tReal, float tIdeal){}
-
 
 
 void setup() {
