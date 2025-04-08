@@ -55,6 +55,14 @@ void correctOrientation(float tf){
    stopotv()  // Stop when angle is reached
 }
 
+ void  moveHere(float xf, float yf) {
+  float ti = Enes100.getTheta();
+  float xi = Enes100.getX();
+  float yi = Enes100.getY();
+
+  int quadAngle = ((ti + 2*PI + PI/4) / (PI/2)) * (PI/2)) % 2*PI; // Gets closest 90 degree multiple
+  correctOrientation(quadAngle);
+
   while (abs(xf - xi) > 0.01 || abs(yf - yi) > 0.01) {  // Continues looping until ideal coordinates are reached
     xi = Enes100.getX();
     yi = Enes100.getY();
