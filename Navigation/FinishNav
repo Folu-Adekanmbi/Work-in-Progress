@@ -3,28 +3,23 @@
 // Orients otv to specified angle
 void correctOrientation(float tf){
   float ti = Enes100.getTheta();
-  float dt = (tf - ti + 360) % 360;
-  
-  if (dt == 0) {
-    stopotv()
-    return;
-  }
+  float dt = ((tf - (ti + 2*PI)) % (2*PI));
 
-  if (dt <= 180) {  // Rotate clockwise
+  if (dt != 0 && dt <= PI) {  // Rotate clockwise
     rotateCW();
-    while ((ti - tf + 360) % 360 > 5) {
+    while  (((tf - (ti + 2*PI)) % (2*PI)) > 0.1) {
       ti = Enes100.getTheta();
-      delay(100);
+      delay(1)
     }
   } 
   else {  // Rotate counter clockwise
     rotateCCW();
-    while ((tf - ti + 360) % 360 > 5) {
+    while  (((tf - (ti + 2*PI)) % (2*PI)) > 0.1) {
       ti = Enes100.getTheta();
-      delay(100);
+      delay(1)
     }
   }
-  motorStop();  // Stop when angle is reached
+   stopotv()  // Stop when angle is reached
 }
 
 // Moves to specific coordinate position
