@@ -55,6 +55,79 @@ void correctOrientation(float tf){
    stopotv()  // Stop when angle is reached
 }
 
+  while (abs(xf - xi) > 0.01 || abs(yf - yi) > 0.01) {  // Continues looping until ideal coordinates are reached
+    xi = Enes100.getX();
+    yi = Enes100.getY();
+    switch (angle) {
+      case 0:  // Facing upwards
+        if (yi < yf) {
+          driveForwards();
+        }
+        else if (yi > yf) { 
+          driveBackwards();
+        }
+        if (xi < xf) {
+          strafeRight();
+        }
+        else if (xi > xf) {
+          strafeLeft();
+        }
+        break;
+
+      case PI/4:  // Facing right
+        if (xi < xf) {
+          driveForwards();
+        }
+        else if (xi > xf) {
+          driveBackwards();  
+        }
+        if (yi < yf) {
+          strafeLeft(); 
+        }
+        else if (yi > yf) {
+          strafeRight();  
+        }
+        break;
+
+      case PI/2:  // Facing downwards
+        if (yi > yf) {
+          driveForwards(); 
+        }
+        else if (yi < yf) {
+          driveBackwards();  
+        }
+        if (xi > xf) {
+          strafeRight();  
+        }
+        else if (xi < xf) {
+          strafeLeft();  
+        }
+        break;
+
+      case 3*PI/4:  // Facing left
+        if (xi > xf) {
+          driveForwards(); 
+        }
+        else if (xi < xf) {
+          driveBackwards(); 
+        }
+        if (yi > yf) {
+          strafeLeft();  
+        }
+        else if (yi < yf) {
+          strafeRight(); 
+        }
+        break;
+    }
+    
+    xi = Enes100.getX(); 
+    yi = Enes100.getY(); 
+
+    delay(1);  // Small delay to allow motors to react
+  }
+  stopotv();
+}
+
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
