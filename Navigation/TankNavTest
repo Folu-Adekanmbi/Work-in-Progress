@@ -21,14 +21,14 @@ void startOrientation() {
       rotateCCW();
       t = Enes100.getTheta();
     }
-    driveForward();
+    driveForwards();
     delay(7000);
   } else if (x == 0.55 && y == 1.45) {
     while (t != -1.57079632679) {
       rotateCCW();
       t = Enes100.getTheta();
     }
-    driveForward();
+    driveForwards();
     delay(7000);
   }
 }
@@ -151,7 +151,7 @@ void motorStop (int m1, int m2) {
   digitalWrite(m2, LOW);
 }
 
-void driveForward () {  
+void driveForwards () {  
 motorCW(PIN_MOTOR_3_FORWARD,PIN_MOTOR_3_REVERSE);
 motorCCW(PIN_MOTOR_1_FORWARD,PIN_MOTOR_1_REVERSE);
 motorCW(PIN_MOTOR_4_FORWARD,PIN_MOTOR_4_REVERSE);
@@ -228,12 +228,7 @@ void loop() {
     }
     else { // otherwise
         Enes100.println("Not visible"); // print not visible
-        
     }
-    // Transmit the weight of the material (in this case, the material is light)
-    Enes100.mission(WEIGHT, LIGHT);
-    // Transmit the MATERIAL_TYPE of the material (Foam or Plastic, in this case FOAM)
-    Enes100.mission(MATERIAL_TYPE, FOAM);
-    delay(1000);
+  moveHere(1.0, 2.0)
 }
   
