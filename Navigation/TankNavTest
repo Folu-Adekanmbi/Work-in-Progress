@@ -10,7 +10,29 @@
 #define PIN_MOTOR_4_FORWARD 2 //BRD1
 #define PIN_MOTOR_4_REVERSE 3 //BRD2
 
-void startOrientation(float xReal, float yReal, float tIdeal){}
+void startOrientation(){}
+
+// Orients otv to specified angle
+void correctOrientation(float tf){
+  float ti = Enes100.getTheta();
+  float dt = ((tf - (ti + 2*PI)) % (2*PI));
+
+  if (dt != 0 && dt <= PI) {  // Rotate clockwise
+    rotateCW();
+    while  (((tf - (ti + 2*PI)) % (2*PI)) > 0.1) {
+      ti = Enes100.getTheta();
+      delay(1)
+    }
+  } 
+  else {  // Rotate counter clockwise
+    rotateCCW();
+    while  (((tf - (ti + 2*PI)) % (2*PI)) > 0.1) {
+      ti = Enes100.getTheta();
+      delay(1)
+    }
+  }
+   stopotv()  // Stop when angle is reached
+}
 
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
@@ -79,14 +101,37 @@ motorStop(PIN_MOTOR_2_FORWARD,PIN_MOTOR_2_REVERSE);
 
 void setup() {
   Tank.begin(); // Must call in order to use any Tank function
-    // Initialize Enes100 Library
-    // Team Name, Mission Type, Marker ID, Room Number, Wifi Module TX Pin, Wifi Module RX Pin
-    Enes100.begin("Work in Progress", MATERIAL, 205, 1116, 3, 2);
-    // At this point we know we are connected.
-    Enes100.println("Connected...");
+  // Initialize Enes100 Library
+  // Team Name, Mission Type, Marker ID, Room Number, Wifi Module TX Pin, Wifi Module RX Pin
+  Enes100.begin("Work in Progress", MATERIAL, 205, 1116, 3, 2);
+  // At this point we know we are connected.
+  Enes100.println("Connected...");
+  float x, y, t; bool v; // Declare variables to hold the data
 }
 
 void loop() {
+  x = Enes100.getX();  // Your X coordinate! 0-4, in meters, -1 if no aruco is not visibility (but you should use Enes100.isVisible to check that instead)
+  y = Enes100.getY();  // Your Y coordinate! 0-2, in meters, also -1 if your aruco is not visible.
+  t = Enes100.getTheta();  //Your theta! -pi to +pi, in radians, -1 if your aruco is not visible.
+  v = Enes100.isVisible(); // Is your aruco visible? True or False.
 
+  if (v) // If the ArUco marker is visible
+    {
+        startOrientation();
+        Enes100.print(x); // print out the location
+        Enes100.print(",");
+        Enes100.print(y);
+        Enes100.print(",");
+        Enes100.println(t);
+    }
+    else { // otherwise
+        Enes100.println("Not visible"); // print not visible
+        
+    }
+    // Transmit the weight of the material (in this case, the material is light)
+    Enes100.mission(WEIGHT, LIGHT);
+    // Transmit the MATERIAL_TYPE of the material (Foam or Plastic, in this case FOAM)
+    Enes100.mission(MATERIAL_TYPE, FOAM);
+    delay(1000);
 }
   
