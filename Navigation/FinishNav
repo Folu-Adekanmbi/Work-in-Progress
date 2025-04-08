@@ -28,10 +28,10 @@ void  moveHere(float xf, float yf) {
   float xi = Enes100.getX();
   float yi = Enes100.getY();
 
-  int quadAngle = ((ti + 45) / 90) * 90) % 360; // Gets closest 90 degree multiple
+  int quadAngle = ((ti + 2*PI + PI/4) / (PI/2)) * (PI/2)) % 2*PI; // Gets closest 90 degree multiple
   correctOrientation(quadAngle);
 
-  while (abs(xf - xi) > 0.5 || abs(yf - yi) > 0.5) {  // Continues looping until ideal coordinates are reached
+  while (abs(xf - xi) > 0. || abs(yf - yi) > 0.5) {  // Continues looping until ideal coordinates are reached
     xi = Enes100.getX();
     yi = Enes100.getY();
     switch (angle) {
