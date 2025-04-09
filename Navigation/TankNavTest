@@ -30,7 +30,7 @@ void correctOrientation(float tf){
       delay(10);
     }
   } 
-  elseif (dt <= PI && dt > 0 || dt > -2*PI && dt < -PI) {  // Rotate counter clockwise
+  else if (dt <= PI && dt > 0 || dt > -2*PI && dt < -PI) {  // Rotate counter clockwise
     Enes100.println("I am running! 2");
     rotateCCW();
     while  (abs(tf - ti) > 0.1) {
