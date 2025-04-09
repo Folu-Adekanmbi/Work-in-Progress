@@ -7,7 +7,7 @@
 #define BRD2 8
 #define BLD1 10
 #define BLD2 11
-#define S 9
+#define S 3
 
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
