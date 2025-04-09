@@ -4,14 +4,22 @@
 #include "Tank.h"
 #include "Enes100.h"
 
-#define PIN_MOTOR_1_REVERSE 11 //FLD1
-#define PIN_MOTOR_1_FORWARD 10 //FLD2
-#define PIN_MOTOR_2_REVERSE 9 //BLD1
-#define PIN_MOTOR_2_FORWARD 8 //BLD2
-#define PIN_MOTOR_3_FORWARD 4 //FRD1
-#define PIN_MOTOR_3_REVERSE 5 //FRD2
-#define PIN_MOTOR_4_FORWARD 2 //BRD1
-#define PIN_MOTOR_4_REVERSE 3 //BRD2
+void driveForwards() {
+  Tank.setRightMotorPWM(100);
+  Tank.setLeftMotorPWM(100);
+}
+void driveBackwards() {
+  Tank.setRightMotorPWM(-100);
+  Tank.setLeftMotorPWM(-100);
+}
+void motorCW() {
+  Tank.setRightMotorPWM(-100);
+  Tank.setLeftMotorPWM(100);
+}
+void motorCCW() {
+  Tank.setRightMotorPWM(100);
+  Tank.setLeftMotorPWM(-100);
+}
 
 // Orients otv to specified angle
 void correctOrientation(float tf){
@@ -20,11 +28,11 @@ void correctOrientation(float tf){
   Enes100.print(dt);
 
   if (dt == 0) {
-    motorStop();
+    Tank.turnOffMotors();
   }
   
   if (dt >= -PI && dt < 0 || dt < 2*PI && dt > PI) {  // Rotate clockwise
-    rotateCW();
+    motorCW();
     while  (abs(tf - ti) > 0.1) {
       ti = Enes100.getTheta();
       delay(10);
@@ -32,13 +40,13 @@ void correctOrientation(float tf){
   } 
   else if (dt <= PI && dt > 0 || dt > -2*PI && dt < -PI) {  // Rotate counter clockwise
     Enes100.println("I am running! 2");
-    rotateCCW();
+    motorCCW();
     while  (abs(tf - ti) > 0.1) {
       ti = Enes100.getTheta();
       delay(10);
     }
   }
-  motorStop();  // Stop when angle is reached
+  Tank.turnOffMotors();  // Stop when angle is reached
 }
 
 void  moveHere(float xf, float yf) {
@@ -62,12 +70,6 @@ void  moveHere(float xf, float yf) {
         else if (yi > yf) { 
           driveBackwards();
         }
-        if (xi < xf) {
-          strafeRight();
-        }
-        else if (xi > xf) {
-          strafeLeft();
-        }
         break;
 
       case 90:  // Facing right
@@ -76,12 +78,6 @@ void  moveHere(float xf, float yf) {
         }
         else if (xi > xf) {
           driveBackwards();  
-        }
-        if (yi < yf) {
-          strafeLeft(); 
-        }
-        else if (yi > yf) {
-          strafeRight();  
         }
         break;
 
@@ -92,12 +88,6 @@ void  moveHere(float xf, float yf) {
         else if (yi < yf) {
           driveBackwards();  
         }
-        if (xi > xf) {
-          strafeRight();  
-        }
-        else if (xi < xf) {
-          strafeLeft();  
-        }
         break;
 
       case 270:  // Facing left
@@ -106,12 +96,6 @@ void  moveHere(float xf, float yf) {
         }
         else if (xi < xf) {
           driveBackwards(); 
-        }
-        if (yi > yf) {
-          strafeLeft();  
-        }
-        else if (yi < yf) {
-          strafeRight(); 
         }
         break;
     }
@@ -122,72 +106,8 @@ void  moveHere(float xf, float yf) {
     delay(100);  // Small delay to allow motors to react
   }
   Enes100.println("I am not running! :( 2");
-  stopotv();
+  Tank.turnOffMotors();
 }
-
-void motorCW (int m1, int m2) {
-  digitalWrite(m1, HIGH);
-  digitalWrite(m2, LOW);
-}
-
-void motorCCW (int m1, int m2) {
-  digitalWrite(m1, LOW);
-  digitalWrite(m2, HIGH);
-}
-
-void motorStop (int m1, int m2) {
-  digitalWrite(m1, LOW);
-  digitalWrite(m2, LOW);
-}
-
-void driveForwards () {  
-motorCW(PIN_MOTOR_3_FORWARD,PIN_MOTOR_3_REVERSE);
-motorCCW(PIN_MOTOR_1_FORWARD,PIN_MOTOR_1_REVERSE);
-motorCW(PIN_MOTOR_4_FORWARD,PIN_MOTOR_4_REVERSE);
-motorCCW(PIN_MOTOR_2_FORWARD,PIN_MOTOR_2_REVERSE);
-}
-void driveBackwards () { 
-motorCCW(PIN_MOTOR_3_FORWARD,PIN_MOTOR_3_REVERSE);
-motorCW(PIN_MOTOR_1_FORWARD,PIN_MOTOR_1_REVERSE);
-motorCCW(PIN_MOTOR_4_FORWARD,PIN_MOTOR_4_REVERSE);
-motorCW(PIN_MOTOR_2_FORWARD,PIN_MOTOR_2_REVERSE);
-}
-void strafeLeft () {
-motorCW(PIN_MOTOR_3_FORWARD,PIN_MOTOR_3_REVERSE);
-motorCW(PIN_MOTOR_1_FORWARD,PIN_MOTOR_1_REVERSE);
-motorCCW(PIN_MOTOR_4_FORWARD,PIN_MOTOR_4_REVERSE);
-motorCCW(PIN_MOTOR_2_FORWARD,PIN_MOTOR_2_REVERSE);
-// check if it makes sense plss
-}
-
-void strafeRight () {
-motorCCW(PIN_MOTOR_3_FORWARD, PIN_MOTOR_3_REVERSE);
-motorCCW(PIN_MOTOR_1_FORWARD, PIN_MOTOR_1_REVERSE);
-motorCW(PIN_MOTOR_4_FORWARD, PIN_MOTOR_4_REVERSE);
-motorCW(PIN_MOTOR_2_FORWARD, PIN_MOTOR_2_REVERSE);
-}
-
-void rotateCW () { // this is actually counter clockwise
-motorCW(PIN_MOTOR_3_FORWARD, PIN_MOTOR_3_REVERSE);
-motorCW(PIN_MOTOR_1_FORWARD, PIN_MOTOR_1_REVERSE);
-motorCW(PIN_MOTOR_4_FORWARD, PIN_MOTOR_4_REVERSE);
-motorCW(PIN_MOTOR_2_FORWARD, PIN_MOTOR_2_REVERSE);
-}
-
-void rotateCCW () { // this is clockwise 
-motorCCW(PIN_MOTOR_3_FORWARD, PIN_MOTOR_3_REVERSE);
-motorCCW(PIN_MOTOR_1_FORWARD, PIN_MOTOR_1_REVERSE);
-motorCCW(PIN_MOTOR_4_FORWARD, PIN_MOTOR_4_REVERSE);
-motorCCW(PIN_MOTOR_2_FORWARD, PIN_MOTOR_2_REVERSE);
-}
-
-void stopotv () {
-motorStop(PIN_MOTOR_3_FORWARD,PIN_MOTOR_3_REVERSE);
-motorStop(PIN_MOTOR_1_FORWARD,PIN_MOTOR_1_REVERSE);
-motorStop(PIN_MOTOR_4_FORWARD,PIN_MOTOR_4_REVERSE);
-motorStop(PIN_MOTOR_2_FORWARD,PIN_MOTOR_2_REVERSE);
-}
-
 
 
 void setup() {
@@ -203,13 +123,13 @@ void loop() {
   y = Enes100.getY();  // Your Y coordinate! 0-2, in meters, also -1 if your aruco is not visible.
   t = Enes100.getTheta();  //Your theta! -pi to +pi, in radians, -1 if your aruco is not visible.
   v = Enes100.isVisible(); // Is your aruco visible? True or False.
+    if (v) {
+      if (Enes100.getY() > 1) {
+          correctOrientation(-PI/2);
+      }
+      else {
+          correctOrientation(PI/2);
+      }
+  }
 
-  if (v) // If the ArUco marker is visible
-    {
-        moveHere(1.0, 2.0);
-    }
-    else { // otherwise
-        Enes100.println("Not visible"); // print not visible
-    }
 }
-  
