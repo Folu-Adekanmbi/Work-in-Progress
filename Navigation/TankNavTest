@@ -1,5 +1,8 @@
-#include <Enes100.h>
-#include <Tank.h>
+#include "cmath"
+#include "iostream"
+#include "Arduino.h"
+#include "Tank.h"
+#include "Enes100.h"
 
 #define PIN_MOTOR_1_REVERSE 11 //FLD1
 #define PIN_MOTOR_1_FORWARD 10 //FLD2
@@ -13,11 +16,11 @@
 // Orients otv to specified angle
 void correctOrientation(float tf){
   float ti = Enes100.getTheta();
-  float dt = fmod((tf - (ti + 2*PI)), 2*PI);
+  float dt = tf - ti;
   Enes100.print(dt);
 
   if (dt != 0 && dt <= PI) {  // Rotate clockwise
-    while  (fmod((tf - (ti + 2*PI)), 2*PI) > 0.1) {
+    while  ((tf - ti) > 0.1) {
       ti = Enes100.getTheta();
       rotateCW();
       delay(1);
@@ -26,7 +29,7 @@ void correctOrientation(float tf){
   else {  // Rotate counter clockwise
     Enes100.println("I am running! 2");
     rotateCCW();
-    while  (fmod((tf - (ti + 2*PI)), 2*PI) > 0.1) {
+    while  ((tf - ti) > 0.1) {
       ti = Enes100.getTheta();
       rotateCCW();
       delay(1);
@@ -39,7 +42,7 @@ void  moveHere(float xf, float yf) {
   float ti = Enes100.getTheta();
   float xi = Enes100.getX();
   float yi = Enes100.getY();
-  float quadAngle = ((int)((2*ti)/PI)) *(PI/2);
+  float quadAngle = round((2*ti)/PI) *(PI/2);
   Enes100.println(quadAngle);
   correctOrientation(quadAngle);
   int quadAngle1 = (int) (quadAngle * (180/PI));
