@@ -38,7 +38,7 @@ void correctOrientation(float tf){
       delay(10);
     }
   }
-   motorStop();  // Stop when angle is reached
+  motorStop();  // Stop when angle is reached
 }
 
 void  moveHere(float xf, float yf) {
