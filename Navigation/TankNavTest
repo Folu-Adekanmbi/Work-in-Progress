@@ -19,38 +19,42 @@ void correctOrientation(float tf){
   float dt = tf - ti;
   Enes100.print(dt);
 
-  if (dt != 0 && dt <= PI) {  // Rotate clockwise
-    while  ((tf - ti) > 0.1) {
+  if (dt == 0) {
+    motorStop();
+  }
+  
+  if (dt >= -PI && dt < 0 || dt < 2*PI && dt > PI) {  // Rotate clockwise
+    rotateCW();
+    while  (abs(tf - ti) > 0.1) {
       ti = Enes100.getTheta();
-      rotateCW();
-      delay(1);
+      delay(10);
     }
   } 
-  else {  // Rotate counter clockwise
+  elseif (dt <= PI && dt > 0 || dt > -2*PI && dt < -PI) {  // Rotate counter clockwise
     Enes100.println("I am running! 2");
     rotateCCW();
-    while  ((tf - ti) > 0.1) {
+    while  (abs(tf - ti) > 0.1) {
       ti = Enes100.getTheta();
-      rotateCCW();
-      delay(1);
+      delay(10);
     }
   }
-   stopotv();  // Stop when angle is reached
+   motorStop();  // Stop when angle is reached
 }
 
 void  moveHere(float xf, float yf) {
   float ti = Enes100.getTheta();
   float xi = Enes100.getX();
   float yi = Enes100.getY();
-  float quadAngle = round((2*ti)/PI) *(PI/2);
+  
+  float quadAngle = round((2*ti)/PI) * (PI/2);
   Enes100.println(quadAngle);
   correctOrientation(quadAngle);
-  int quadAngle1 = (int) (quadAngle * (180/PI));
+  int degreeAngle = (int) (quadAngle * (180/PI) + 180);
 
   while (abs(xf - xi) > 0.01 || abs(yf - yi) > 0.01) {  // Continues looping until ideal coordinates are reached
     xi = Enes100.getX();
     yi = Enes100.getY();
-    switch (quadAngle1) {
+    switch (degreeAngle) {
       case 0:  // Facing upwards
         if (yi < yf) {
           driveForwards();
@@ -115,7 +119,7 @@ void  moveHere(float xf, float yf) {
     xi = Enes100.getX(); 
     yi = Enes100.getY(); 
 
-    delay(1);  // Small delay to allow motors to react
+    delay(100);  // Small delay to allow motors to react
   }
   Enes100.println("I am not running! :( 2");
   stopotv();
