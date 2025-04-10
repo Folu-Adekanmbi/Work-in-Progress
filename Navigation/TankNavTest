@@ -5,44 +5,54 @@
 #include "Enes100.h"
 
 void driveForwards() {
-  Tank.setRightMotorPWM(100);
-  Tank.setLeftMotorPWM(100);
+  Tank.setRightMotorPWM(255);
+  Tank.setLeftMotorPWM(255);
 }
 void driveBackwards() {
-  Tank.setRightMotorPWM(-100);
-  Tank.setLeftMotorPWM(-100);
+  Tank.setRightMotorPWM(-255);
+  Tank.setLeftMotorPWM(-255);
 }
 void motorCW() {
-  Tank.setRightMotorPWM(-100);
-  Tank.setLeftMotorPWM(100);
+  Tank.setRightMotorPWM(-50);
+  Tank.setLeftMotorPWM(50);
 }
 void motorCCW() {
-  Tank.setRightMotorPWM(100);
-  Tank.setLeftMotorPWM(-100);
+  Tank.setRightMotorPWM(50);
+  Tank.setLeftMotorPWM(-50);
+}
+
+int getAdjustedAngle() {
+  float t = Enes100.getTheta();  // Range: [-π, π]
+  float deg = t * 180.0 / PI;    // Convert to degrees
+  // Normalize angle to be within [0, 360)
+  deg = 450 - deg;               // Remap to 0° = up
+  if (deg < 0) deg += 360;       // Ensure angle is positive
+  if (deg >= 360) deg -= 360;    // Ensure angle is less than 360
+
+  return (int) round(deg);       // Return rounded value as integer
 }
 
 // Orients otv to specified angle
-void correctOrientation(float tf){
-  float ti = Enes100.getTheta();
-  float dt = tf - ti;
-  Enes100.print(dt);
+void correctOrientation(int finalDeg){
+  int initialDeg = getAdjustedAngle();
+  int dDeg = (finalDeg - initialDeg + 360) % 360;
+  Enes100.print(dDeg);
 
-  if (dt == 0) {
+  if (abs(dDeg) > 0.05) {
     Tank.turnOffMotors();
   }
   
-  if (dt >= -PI && dt < 0 || dt < 2*PI && dt > PI) {  // Rotate clockwise
+  if (dDeg <= 180) {  // Rotate clockwise
     motorCW();
-    while  (abs(tf - ti) > 0.1) {
-      ti = Enes100.getTheta();
+    while  (abs(initialDeg - finalDeg) > 5) {
+      initialDeg = getAdjustedAngle();
       delay(10);
     }
   } 
-  else if (dt <= PI && dt > 0 || dt > -2*PI && dt < -PI) {  // Rotate counter clockwise
-    Enes100.println("I am running! 2");
+  else {  // Rotate counter clockwise
     motorCCW();
-    while  (abs(tf - ti) > 0.1) {
-      ti = Enes100.getTheta();
+    while  (abs(finalDeg - initialDeg) > 5) {
+      initialDeg = getAdjustedAngle();
       delay(10);
     }
   }
@@ -50,65 +60,199 @@ void correctOrientation(float tf){
 }
 
 void  moveHere(float xf, float yf) {
-  float ti = Enes100.getTheta();
   float xi = Enes100.getX();
   float yi = Enes100.getY();
   
-  float quadAngle = round((2*ti)/PI) * (PI/2);
-  Enes100.println(quadAngle);
-  correctOrientation(quadAngle);
-  int degreeAngle = (int) (quadAngle * (180/PI) + 180);
-
-  while (abs(xf - xi) > 0.01 || abs(yf - yi) > 0.01) {  // Continues looping until ideal coordinates are reached
-    xi = Enes100.getX();
-    yi = Enes100.getY();
-    switch (degreeAngle) {
-      case 0:  // Facing upwards
-        if (yi < yf) {
-          driveForwards();
-        }
-        else if (yi > yf) { 
-          driveBackwards();
-        }
-        break;
-
-      case 90:  // Facing right
-        if (xi < xf) {
-          driveForwards();
-        }
-        else if (xi > xf) {
-          driveBackwards();  
-        }
-        break;
-
-      case 180:  // Facing downwards
-        if (yi > yf) {
-          driveForwards(); 
-        }
-        else if (yi < yf) {
-          driveBackwards();  
-        }
-        break;
-
-      case 270:  // Facing left
-        if (xi > xf) {
-          driveForwards(); 
-        }
-        else if (xi < xf) {
-          driveBackwards(); 
-        }
-        break;
-    }
-    
-    xi = Enes100.getX(); 
-    yi = Enes100.getY(); 
-
-    delay(100);  // Small delay to allow motors to react
+  // Orient to nearest quadrant
+  int currentAngle = getAdjustedAngle();
+  int quadAngle = 0;
+  
+  if (currentAngle >= 0 && currentAngle < 45) {
+    quadAngle = 0;   // Facing up (0°)
+  } else if (currentAngle >= 45 && currentAngle < 135) {
+    quadAngle = 90;  // Facing right (90°)
+  } else if (currentAngle >= 135 && currentAngle < 225) {
+    quadAngle = 180; // Facing down (180°)
+  } else if (currentAngle >= 225 && currentAngle < 315) {
+    quadAngle = 270; // Facing left (270°)
+  } else {
+    quadAngle = 0;   // Wrap back to 0° for angles between 315° and 360°
   }
-  Enes100.println("I am not running! :( 2");
+  
+  // Correct Orientation to closest quad angle
+  correctOrientation(quadAngle);
+
+  if (quadAngle == 0) { // Robot facing up
+      if (abs(yf - yi) > 0.05) {
+          if (yf > yi) {
+              driveForwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(xf - xi) > 0.05) {
+          correctOrientation(90);
+          if (xf > xi) {
+              driveForwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+  else if (quadAngle == 90) { // Robot facing right
+      if (abs(xf - xi) > 0.05) {
+          if (xf > xi) {
+              driveForwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(yf - yi) > 0.05) {
+          correctOrientation(180);
+          if (yf > yi) {
+              driveBackwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+  else if (quadAngle == 180) { // Robot facing down
+      if (abs(yf - yi) > 0.05) {
+          if (yf > yi) {
+              driveBackwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(xf - xi) > 0.05) {
+          correctOrientation(270);
+          if (xf > xi) {
+              driveBackwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+  else { // Robot facing left
+      if (abs(xf - xi) > 0.05) {
+          if (xf > xi) {
+              driveBackwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(xf - xi) > 0.05) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(yf - yi) > 0.05) {
+          correctOrientation(0);
+          if (yf > yi) {
+              driveForwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(yf - yi) > 0.05) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+
+  delay(100);  // Small delay to allow motors to react
   Tank.turnOffMotors();
 }
 
+void mission() {
+    if (Enes100.getY() > 1) {
+        correctOrientation(180);
+        moveHere(0.55, 0.15);
+    }
+    else {
+        correctOrientation(0);
+        moveHere(0.55, 1.85);
+    }
+}
+
+void finish() {
+    moveHere(0.55, 1.9);
+    moveHere(3.5, 1.9);
+    if (Enes100.getX > 3.5) {
+        Tank.turnOffMotors();
+    }
+}
 
 void setup() {
   Tank.begin();
@@ -124,12 +268,7 @@ void loop() {
   t = Enes100.getTheta();  //Your theta! -pi to +pi, in radians, -1 if your aruco is not visible.
   v = Enes100.isVisible(); // Is your aruco visible? True or False.
     if (v) {
-      if (Enes100.getY() > 1) {
-          correctOrientation(-PI/2);
-      }
-      else {
-          correctOrientation(PI/2);
-      }
+      mission();
+      finish();
   }
-
 }
