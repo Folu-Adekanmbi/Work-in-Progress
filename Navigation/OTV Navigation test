@@ -41,6 +41,174 @@ void correctOrientation(float tf) {
   stopotv();
 }
 
+void moveHere(float xf, float yf) {
+  float xi = Enes100.getX();
+  float yi = Enes100.getY();
+  float ti = Enes100.getTheta();
+  float quadAngle = 0;
+
+  if (ti >= 3 * PI / 4 || ti < -3 * PI / 4)      quadAngle = PI;
+  else if (ti >= PI / 4)                         quadAngle = PI / 2;
+  else if (ti >= -PI / 4)                        quadAngle = 0;
+  else                                           quadAngle = -PI / 2;
+
+  correctOrientation(quadAngle);
+
+  float tolerance = 0.1;  // Increased tolerance for linear movement
+
+  if (quadAngle == PI/2) { // Robot facing up
+      if (abs(yf - yi) > tolerance) {
+          if (yf > yi) {
+              driveForwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(xf - xi) > tolerance) {
+          correctOrientation(0);
+          if (xf > xi) {
+              driveForwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+  else if (quadAngle == 0) { // Robot facing right
+      if (abs(xf - xi) > tolerance) {
+          if (xf > xi) {
+              driveForwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(yf - yi) > tolerance) {
+          correctOrientation(-PI/2);
+          if (yf > yi) {
+              driveBackwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+  else if (quadAngle == -PI/2) { // Robot facing down
+      if (abs(yf - yi) > tolerance) {
+          if (yf > yi) {
+              driveBackwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(xf - xi) > tolerance) {
+          correctOrientation(PI);
+          if (xf > xi) {
+              driveBackwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+  else { // Robot facing left
+      if (abs(xf - xi) > tolerance) {
+          if (xf > xi) {
+              driveBackwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+          else {
+              driveForwards();
+              while (abs(xf - xi) > tolerance) {
+                  xi = Enes100.getX();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+      if (abs(yf - yi) > tolerance) {
+          correctOrientation(PI/2);
+          if (yf > yi) {
+              driveForwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+          else {
+              driveBackwards();
+              while (abs(yf - yi) > tolerance) {
+                  yi = Enes100.getY();
+              }
+          }
+      }
+      else {
+          Tank.turnOffMotors();
+      }
+  }
+
+  delay(100);  // Small delay to allow motors to react
+  Tank.turnOffMotors();
+}
+
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
