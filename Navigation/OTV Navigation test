@@ -18,7 +18,7 @@ float normalizeAngle(float angle) {
   return angle;
 }
 
-void pid_controller(float setpoint, float pv, float previous_error, dt){
+float pid_controller(float setpoint, float pv, float previous_error, float dt){
     float kp = 1;
     float kd = 1;
     float error = normalizeAngle(setpoint - pv);
