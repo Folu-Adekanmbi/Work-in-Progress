@@ -1,3 +1,9 @@
+#include "cmath"
+#include "iostream"
+#include "Arduino.h"
+#include "Tank.h"
+#include "Enes100.h"
+
 //F is front, B is back, R is right, L is left, D is drive, S is speed for these pin assignments
 #define FRD1 8
 #define FRD2 7
