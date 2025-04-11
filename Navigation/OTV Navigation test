@@ -15,6 +15,35 @@
 #define BLD2 13
 #define S 3
 
+// Normalize angle to [-π, π]
+float normalizeAngle(float angle) {
+  while (angle > PI) angle -= 2 * PI;
+  while (angle < -PI) angle += 2 * PI;
+  return angle;
+}
+
+// Proportional angle correction
+void correctOrientation(float tf) {
+  float ti = Enes100.getTheta();
+  float dt = normalizeAngle(tf - ti);
+  float Kp = 50.0;
+
+  while (abs(dt) > 0.05) {
+    ti = Enes100.getTheta();
+    dt = normalizeAngle(tf - ti);
+    int pwmSpeed = Kp * abs(dt);
+    if (pwmSpeed > 255) pwmSpeed = 255;
+
+    if (dt > 0) {
+      rotateCCW();
+    } else {
+      rotateCW();
+    }
+    delay(10);
+  }
+  stopotv();
+}
+
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
