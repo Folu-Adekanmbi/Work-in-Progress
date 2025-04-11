@@ -41,7 +41,7 @@ void correctOrientation(float tf) {
   stopotv();
 }
 
-void moveHere(float xf, float yf) {
+/* void moveHere(float xf, float yf) {
   float xi = Enes100.getX();
   float yi = Enes100.getY();
   float ti = Enes100.getTheta();
@@ -207,7 +207,7 @@ void moveHere(float xf, float yf) {
 
   delay(100);  // Small delay to allow motors to react
   Tank.turnOffMotors();
-}
+} */
 
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
