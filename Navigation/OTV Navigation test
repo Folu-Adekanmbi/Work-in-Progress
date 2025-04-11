@@ -206,16 +206,16 @@ void correctOrientation(float tf) {
   Tank.turnOffMotors();
 } */
 
-void motorCW (int m1, int m2) {
+void motorCW (int m1, int m2, int p) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
-  analogWrite(S, 65);
+  analogWrite(S, p);
 }
 
-void motorCCW (int m1, int m2) {
+void motorCCW (int m1, int m2, int p) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
-  analogWrite(S, 65);
+  analogWrite(S, p);
 }
 
 void motorStop (int m1, int m2) {
@@ -224,19 +224,19 @@ void motorStop (int m1, int m2) {
   digitalWrite(S, LOW);
 }
 
-void driveForwards () {
+void driveForwards (int p) {
 motorCCW(FRD1,FRD2);
 motorCW(FLD1,FLD2);
 motorCCW(BRD1,BRD2);
 motorCW(BLD1,BLD2);
 }
-void driveBackwards () {
+void driveBackwards (int p) {
 motorCW(FRD1,FRD2);
 motorCCW(FLD1,FLD2);
 motorCW(BRD1,BRD2);
 motorCCW(BLD1,BLD2);
 }
-void strafeLeft () {
+void strafeLeft (int p) {
 motorCCW(FRD1,FRD2);
 motorCW(BRD1,BRD2);
 motorCCW(FLD1,FLD2);
@@ -244,21 +244,21 @@ motorCW(BLD1,BLD2);
 // check if it makes sense plss
 }
 
-void strafeRight () {
+void strafeRight (int p) {
 motorCW(FRD1, FRD2);
 motorCCW(BRD1, BRD2);
 motorCW(FLD1, FLD2);
 motorCCW(BLD1, BLD2);
 }
 
-void rotateCW () {
+void rotateCW (int p) {
 motorCW(FRD1, FRD2);
 motorCW(FLD1, FLD2);
 motorCW(BRD1, BRD2);
 motorCW(BLD1, BLD2);
 }
 
-void rotateCCW () {
+void rotateCCW (int p) {
 motorCCW(FRD1, FRD2);
 motorCCW(FLD1, FLD2);
 motorCCW(BRD1, BRD2);
