@@ -237,44 +237,44 @@ void motorStop (int m1, int m2) {
 }
 
 void driveForwards (int p) {
-motorCCW(FRD1,FRD2);
-motorCW(FLD1,FLD2);
-motorCCW(BRD1,BRD2);
-motorCW(BLD1,BLD2);
+motorCCW(FRD1,FRD2, p);
+motorCW(FLD1,FLD2, p);
+motorCCW(BRD1,BRD2, p);
+motorCW(BLD1,BLD2, p);
 }
 void driveBackwards (int p) {
-motorCW(FRD1,FRD2);
-motorCCW(FLD1,FLD2);
-motorCW(BRD1,BRD2);
-motorCCW(BLD1,BLD2);
+motorCW(FRD1,FRD2, p);
+motorCCW(FLD1,FLD2, p);
+motorCW(BRD1,BRD2, p);
+motorCCW(BLD1,BLD2, p);
 }
 void strafeLeft (int p) {
-motorCCW(FRD1,FRD2);
-motorCW(BRD1,BRD2);
-motorCCW(FLD1,FLD2);
-motorCW(BLD1,BLD2);
+motorCCW(FRD1,FRD2, p);
+motorCW(BRD1,BRD2, p);
+motorCCW(FLD1,FLD2, p);
+motorCW(BLD1,BLD2, p);
 // check if it makes sense plss
 }
 
 void strafeRight (int p) {
-motorCW(FRD1, FRD2);
-motorCCW(BRD1, BRD2);
-motorCW(FLD1, FLD2);
-motorCCW(BLD1, BLD2);
+motorCW(FRD1, FRD2, p);
+motorCCW(BRD1, BRD2, p);
+motorCW(FLD1, FLD2, p);
+motorCCW(BLD1, BLD2, p);
 }
 
 void rotateCW (int p) {
-motorCW(FRD1, FRD2);
-motorCW(FLD1, FLD2);
-motorCW(BRD1, BRD2);
-motorCW(BLD1, BLD2);
+motorCW(FRD1, FRD2, p);
+motorCW(FLD1, FLD2, p);
+motorCW(BRD1, BRD2, p);
+motorCW(BLD1, BLD2, p);
 }
 
 void rotateCCW (int p) {
-motorCCW(FRD1, FRD2);
-motorCCW(FLD1, FLD2);
-motorCCW(BRD1, BRD2);
-motorCCW(BLD1, BLD2);
+motorCCW(FRD1, FRD2, p);
+motorCCW(FLD1, FLD2, p);
+motorCCW(BRD1, BRD2, p);
+motorCCW(BLD1, BLD2, p);
 }
 
 void stopotv () {
