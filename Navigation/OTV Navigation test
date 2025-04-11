@@ -1,8 +1,4 @@
-#include "cmath"
-#include "iostream"
-#include "Arduino.h"
-#include "Tank.h"
-#include "Enes100.h"
+#include <Enes100.h>
 
 //F is front, B is back, R is right, L is left, D is drive, S is speed for these pin assignments
 #define FRD1 8
@@ -13,7 +9,7 @@
 #define BRD2 5
 #define BLD1 12
 #define BLD2 13
-#define S 3
+#define S 9
 
 // Normalize angle to [-π, π]
 float normalizeAngle(float angle) {
@@ -26,17 +22,18 @@ float normalizeAngle(float angle) {
 void correctOrientation(float tf) {
   float ti = Enes100.getTheta();
   float dt = normalizeAngle(tf - ti);
-  float Kp = 50.0;
 
   while (abs(dt) > 0.05) {
     ti = Enes100.getTheta();
     dt = normalizeAngle(tf - ti);
+    Enes100.println(dt);
     if (dt > 0) {
       rotateCCW();
     } else {
       rotateCW();
     }
     delay(10);
+
   }
   stopotv();
 }
@@ -212,13 +209,13 @@ void correctOrientation(float tf) {
 void motorCW (int m1, int m2) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
-  digitalWrite(S, HIGH);
+  analogWrite(S, 65);
 }
 
 void motorCCW (int m1, int m2) {
   digitalWrite(m1, LOW);
   digitalWrite(m2, HIGH);
-  digitalWrite(S, HIGH);
+  analogWrite(S, 65);
 }
 
 void motorStop (int m1, int m2) {
@@ -285,9 +282,12 @@ pinMode (FLD2, OUTPUT);
 pinMode (BLD1, OUTPUT);
 pinMode (BLD2, OUTPUT);
 pinMode (S, OUTPUT);
+Enes100.begin("Work in Progress", MATERIAL, 77, 1116, 3, 2);
+  delay(200);
+  Enes100.print("Successfully connected to the Vision System");
 }
 
 void loop() {
-  
+  correctOrientation(PI/2);
 }
   
