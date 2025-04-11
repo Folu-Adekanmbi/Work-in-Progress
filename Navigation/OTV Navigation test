@@ -31,9 +31,6 @@ void correctOrientation(float tf) {
   while (abs(dt) > 0.05) {
     ti = Enes100.getTheta();
     dt = normalizeAngle(tf - ti);
-    int pwmSpeed = Kp * abs(dt);
-    if (pwmSpeed > 255) pwmSpeed = 255;
-
     if (dt > 0) {
       rotateCCW();
     } else {
