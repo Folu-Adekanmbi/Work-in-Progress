@@ -18,19 +18,31 @@ float normalizeAngle(float angle) {
   return angle;
 }
 
+void pid_controller(float setpoint, float pv, float previous_error, dt){
+    float kp = 1;
+    float kd = 1;
+    float error = normalizeAngle(setpoint - pv);
+    float derivative = (error - previous_error) / dt;
+    float control = kp * error + kd * derivative;
+    return control;
+}
+
 // Proportional angle correction
 void correctOrientation(float tf) {
   float ti = Enes100.getTheta();
   float dt = normalizeAngle(tf - ti);
-
+  float time = 0;
+  float P = 0;
   while (abs(dt) > 0.05) {
+    time += 0.010;
+    P = pid_controller(tf, ti, dt, time);
     ti = Enes100.getTheta();
     dt = normalizeAngle(tf - ti);
     Enes100.println(dt);
     if (dt > 0) {
-      rotateCCW();
+      rotateCCW(P);
     } else {
-      rotateCW();
+      rotateCW(P);
     }
     delay(10);
 
