@@ -13,16 +13,16 @@
 
 // Normalize angle to [0, 2π]
 float normalizeAngle(float angle) {
-  fmod(angle, 2*PI);
+  angle = fmod(angle, 2*PI);
   if (angle < 0) angle += 2 * PI;
   return angle;
 }
 
-int pid_controller(float setpoint, float pv, float previous_error, long dt){
+int pid_controller(float setpoint, float pv, float previous_error, long diffTime){
     float kp = 1;
     float kd = 1;
-    float error = abs(normalizeAngle(setpoint - pv));
-    float derivative = ((error - previous_error) / dt);
+    float error = fabs(normalizeAngle(setpoint - pv));
+    float derivative = ((error - previous_error) / ((float)diffTime));
     float control = kp * error + kd * derivative;
     return control;
 }
@@ -31,7 +31,7 @@ int pid_controller(float setpoint, float pv, float previous_error, long dt){
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
   float ti = normalizeAngle(Enes100.getTheta());
-  float dt = abs(normalizeAngle(tf - ti));
+  float dt = fabs(normalizeAngle(tf - ti));
   long startTime = micros();
   long diffTime = 0;
   float P = 255;
@@ -40,7 +40,7 @@ void correctOrientation(float tf) {
     ti = normalizeAngle(Enes100.getTheta());
     P = pid_controller(tf, ti, dt, time);
     startTime = micros();
-    dt = abs(normalizeAngle(tf - ti));
+    dt = fabs(normalizeAngle(tf - ti));
     Enes100.println(dt);
     Enes100.println(P);
     if ((tf - ti) > 0) {
