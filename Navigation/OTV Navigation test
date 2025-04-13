@@ -27,7 +27,7 @@ int pid_controller(float setpoint, float pv, float previous_error, long diffTime
     return control;
 }
 
-// Proportional angle correction
+//Angle correction to a set angle
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
   float ti = normalizeAngle(Enes100.getTheta());
