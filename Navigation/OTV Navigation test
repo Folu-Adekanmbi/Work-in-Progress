@@ -18,11 +18,11 @@ float normalizeAngle(float angle) {
   return angle;
 }
 
-int pid_controller(float setpoint, float pv, float previous_error, float dt){
+int pid_controller(float setpoint, float pv, float previous_error, long dt){
     float kp = 1;
     float kd = 1;
-    float error = normalizeAngle(setpoint - pv);
-    float derivative = (error - previous_error) / dt;
+    float error = abs(normalizeAngle(setpoint - pv));
+    float derivative = ((error - previous_error) / dt);
     float control = kp * error + kd * derivative;
     return control;
 }
@@ -31,23 +31,23 @@ int pid_controller(float setpoint, float pv, float previous_error, float dt){
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
   float ti = normalizeAngle(Enes100.getTheta());
-  float dt = normalizeAngle(tf - ti);
-  float time = 0;
-  float P = 0;
-  while (abs(dt) > 0.05) {
-    time += 0.010;
+  float dt = abs(normalizeAngle(tf - ti));
+  long startTime = micros();
+  long diffTime = 0;
+  float P = 255;
+  while (P > 5) {
+    diffTime = micros() - startTime;
     ti = normalizeAngle(Enes100.getTheta());
-    dt = normalizeAngle(tf - ti);
     P = pid_controller(tf, ti, dt, time);
+    startTime = micros();
+    dt = abs(normalizeAngle(tf - ti));
     Enes100.println(dt);
     Enes100.println(P);
-    if (dt > 0) {
+    if ((tf - ti) > 0) {
       rotateCCW(P);
     } else {
       rotateCW(P);
     }  
-    delay(10);
-
   }
   stopotv();
 }
