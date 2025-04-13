@@ -11,10 +11,10 @@
 #define BLD2 13
 #define S 9
 
-// Normalize angle to [-π, π]
+// Normalize angle to [0, 2π]
 float normalizeAngle(float angle) {
-  while (angle > PI) angle -= 2 * PI;
-  while (angle < -PI) angle += 2 * PI;
+  fmod(angle, 2*PI);
+  if (angle < 0) angle += 2 * PI;
   return angle;
 }
 
@@ -29,13 +29,14 @@ int pid_controller(float setpoint, float pv, float previous_error, float dt){
 
 // Proportional angle correction
 void correctOrientation(float tf) {
-  float ti = Enes100.getTheta();
+  tf = normalizeAngle(tf);
+  float ti = normalizeAngle(Enes100.getTheta());
   float dt = normalizeAngle(tf - ti);
   float time = 0;
   float P = 0;
   while (abs(dt) > 0.05) {
     time += 0.010;
-    ti = Enes100.getTheta();
+    ti = normalizeAngle(Enes100.getTheta());
     dt = normalizeAngle(tf - ti);
     P = pid_controller(tf, ti, dt, time);
     Enes100.println(dt);
