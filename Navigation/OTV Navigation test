@@ -11,68 +11,45 @@
 #define BLD2 13
 #define S 9
 
-// Normalize angle to [-π, π]
+// Normalize angle to [0, 2π]
 float normalizeAngle(float angle) {
-  while (angle > PI) angle -= 2 * PI;
-  while (angle < -PI) angle += 2 * PI;
+  angle = fmod(angle, 2*PI);
+  if (angle < 0) angle += 2 * PI;
   return angle;
 }
-/*float previous_error, /*float dt*/
-int pid_controller(float setpoint, float pv){
-    float kp = 10;
+
+int pid_controller(float setpoint, float pv, float previous_error, long diffTime){
+    float kp = 1;
     float kd = 1;
-    float error = (setpoint - pv);
-    //float derivative = (error - previous_error) / dt;
-    float control = kp * error;// + kd * derivative;
+    float error = fabs(normalizeAngle(setpoint - pv));
+    float derivative = ((error - previous_error) / ((float)diffTime));
+    float control = kp * error + kd * derivative;
     return control;
 }
 
-// Proportional angle correction
+//Angle correction to a set angle
 void correctOrientation(float tf) {
-  float ti = Enes100.getTheta();
-  float dt = (tf - ti);
-  float time = 0;
+  tf = normalizeAngle(tf);
+  float ti = normalizeAngle(Enes100.getTheta());
+  float dt = fabs(normalizeAngle(tf - ti));
+  long startTime = micros();
+  long diffTime = 0;
   float P = 255;
-
-  if (dt >= -PI && dt < 0 || dt < 2*PI && dt > PI) {
-    while (abs(dt) > 0.05) {
-    time += 0.010;
-    ti = Enes100.getTheta();
-    dt = (tf - ti);
-    /*dt, time*/
-    P = pid_controller(tf, ti);
-    rotateCW(P);
+  while (dt > 0.05) {
+    diffTime = micros() - startTime;
+    ti = normalizeAngle(Enes100.getTheta());
+    P = pid_controller(tf, ti, dt, diffTime);
+    startTime = micros();
+    dt = fabs(normalizeAngle(tf - ti));
     Enes100.println(dt);
     Enes100.println(P);
-    }
-  }  // Rotate clockwise
-  if (dt <= PI && dt > 0 || dt > -2*PI && dt < -PI) {
-    while (abs(dt) > 0.05) {
-    time += 0.010;
-    ti = Enes100.getTheta();
-    dt = (tf - ti);
-    /*dt, time*/
-    P = pid_controller(tf, ti);
-    rotateCCW(P);
-    Enes100.println(dt);
-    Enes100.println(P);
-    }
-  }  // Rotate CCW
-  /*while (P > 2) {
-    time += 0.010;
-    ti = Enes100.getTheta();
-    dt = normalizeAngle(tf - ti);
-    P = pid_controller(tf, ti, /*dt, time*/
-    /*Enes100.println(dt);
-    Enes100.println(P);
-    if (dt > 0.05) {
+    if ((tf - ti) > 0) {
       rotateCCW(P);
     } else {
       rotateCW(P);
-    }
-    delay(10);
-
-  }*/
+    }  
+  }
+  stopotv();
 }
 
 /* void moveHere(float xf, float yf) {
