@@ -11,10 +11,11 @@
 #define BLD2 13
 #define S 9
 
-// Normalize angle to [0, 2π]
+// Normalize angle to [-π, π)
 float normalizeAngle(float angle) {
   angle = fmod(angle, 2*PI);
-  if (angle < 0) angle += 2 * PI;
+  if (angle > PI) angle -= 2 * PI;
+  if (angle < -PI) angle += 2 * PI;
   return angle;
 }
 
@@ -22,10 +23,12 @@ float normalizeAngle(float angle) {
 int pd_controller(float setpoint, float pv, float previous_error, long diffTime){
     float kp = 1;
     float kd = 1;
-    float error = fabs(setpoint - pv);
-    float derivative = ((error - previous_error) / ((float)diffTime));
+    float error = setpoint - pv;
+    float derivative = 0;
+    if (diffTime > 0) derivative = ((error - previous_error) / ((float)diffTime));
     float control = kp * error + kd * derivative;
-    return control;
+    control = constrain(control, -255, 255);
+    return (int)control;
 }
 
 // Controls linear movement
@@ -41,24 +44,20 @@ int pd_linear_controller(float target_distance, float current_distance, float pr
 // Angle correction to a set angle
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
-  float ti = normalizeAngle(Enes100.getTheta());
-  float dt = fabs(tf - ti);
+  float ti = Enes100.getTheta();
+  float dt = tf - ti;
   long startTime = micros();
   long diffTime = 0;
-  float P = 255;
-  while (dt > 0.05) {
+  float P = 0;
+  while (abs(tf-ti) > 0.05) {
     diffTime = micros() - startTime;
-    ti = normalizeAngle(Enes100.getTheta());
+    ti = Enes100.getTheta();
     P = pd_controller(tf, ti, dt, diffTime);
+    dt = (tf - ti);
     startTime = micros();
-    dt = fabs(normalizeAngle(tf - ti));
     Enes100.println(dt);
     Enes100.println(P);
-    if ((tf - ti) > 0) {
-      rotateCCW(P);
-    } else {
-      rotateCW(P);
-    }  
+    rotateOTV(P);
   }
   stopotv();
 }
@@ -285,19 +284,23 @@ motorCW(FLD1, FLD2, p);
 motorCCW(BLD1, BLD2, p);
 }
 
-void rotateCW (int p) {
-motorCW(FRD1, FRD2, p);
-motorCW(FLD1, FLD2, p);
-motorCW(BRD1, BRD2, p);
-motorCW(BLD1, BLD2, p);
+void rotateOTV (int p) {
+  if (p < 0) {
+    p = abs(p);
+    motorCW(FRD1, FRD2, p);
+    motorCW(FLD1, FLD2, p);
+    motorCW(BRD1, BRD2, p);
+    motorCW(BLD1, BLD2, p);
+  } else {
+    p = abs(p);
+    motorCCW(FRD1, FRD2, p);
+    motorCCW(FLD1, FLD2, p);
+    motorCCW(BRD1, BRD2, p);
+    motorCCW(BLD1, BLD2, p);
+  }
+
 }
 
-void rotateCCW (int p) {
-motorCCW(FRD1, FRD2, p);
-motorCCW(FLD1, FLD2, p);
-motorCCW(BRD1, BRD2, p);
-motorCCW(BLD1, BLD2, p);
-}
 
 void stopotv () {
 motorStop(FRD1, FRD2);
