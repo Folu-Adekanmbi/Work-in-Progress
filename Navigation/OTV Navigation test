@@ -35,7 +35,7 @@ void correctOrientation(float tf) {
   long startTime = micros();
   long diffTime = 0;
   float P = 255;
-  while (P > 5) {
+  while (dt > 0.05) {
     diffTime = micros() - startTime;
     ti = normalizeAngle(Enes100.getTheta());
     P = pid_controller(tf, ti, dt, diffTime);
