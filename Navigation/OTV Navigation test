@@ -21,13 +21,19 @@ float normalizeAngle(float angle) {
 
 // Controls angular movement
 int pd_controller(float setpoint, float pv, float previous_error, long diffTime){
-    float kp = 1;
-    float kd = 1;
+    float kp = 125;
+    float kd = 10;
     float error = setpoint - pv;
     float derivative = 0;
     if (diffTime > 0) derivative = ((error - previous_error) / (((float)diffTime) / 1000000));
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; 
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40;
+    }
     return (int)control;
 }
 
@@ -61,7 +67,7 @@ void correctOrientation(float tf) {
   }
   stopotv();
 }
-
+/*
 float quadAngle(float t) {
   if (t >= PI / 4 && t < 3 * PI / 4) {    
     t = PI / 2;
@@ -238,6 +244,7 @@ void finish(float x) {
   moveHere(0.55, 1.87);
   moveHere(3.50, 1.87);
 }
+*/
 
 void motorCW (int m1, int m2, int p) {
   digitalWrite(m1, HIGH);
@@ -319,16 +326,12 @@ pinMode (FLD2, OUTPUT);
 pinMode (BLD1, OUTPUT);
 pinMode (BLD2, OUTPUT);
 pinMode (S, OUTPUT);
-Enes100.begin("Work in Progress", MATERIAL, 77, 1116, 3, 2);
+Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 3, 2);
   delay(200);
   Enes100.print("Successfully connected to the Vision System");
 }
 
 void loop() {
-  bool v = Enes100.isVisible();
-  if (v) {
-    finish(x);
-  }
   correctOrientation(PI/2);
 }
   
