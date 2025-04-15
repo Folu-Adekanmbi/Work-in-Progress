@@ -21,8 +21,8 @@ float normalizeAngle(float angle) {
 
 // Controls angular movement
 int pd_controller(float setpoint, float pv, float previous_error, long diffTime){
-    float kp = 125;
-    float kd = 10;
+    float kp = 60;
+    float kd = 17;
     float error = setpoint - pv;
     float derivative = 0;
     if (diffTime > 0) derivative = ((error - previous_error) / (((float)diffTime) / 1000000));
@@ -55,19 +55,20 @@ void correctOrientation(float tf) {
   long startTime = micros();
   long diffTime = 0;
   float P = 0;
-  while (abs(tf-ti) > 0.05) {
+  while (abs(tf-ti) > 0.02) {
     diffTime = micros() - startTime;
     ti = Enes100.getTheta();
     P = pd_controller(tf, ti, dt, diffTime);
     dt = (tf - ti);
     startTime = micros();
-    Enes100.println(dt);
-    Enes100.println(P);
+   // Enes100.println(dt);
+    //Enes100.println(P);
     rotateOTV(P);
   }
+  Enes100.println("I'm done!!!!!! :DDDDDDDDDDDDDDD");
   stopotv();
 }
-/*
+
 float quadAngle(float t) {
   if (t >= PI / 4 && t < 3 * PI / 4) {    
     t = PI / 2;
