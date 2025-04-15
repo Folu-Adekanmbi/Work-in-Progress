@@ -10,6 +10,7 @@
 #define BLD1 12
 #define BLD2 13
 #define S 9
+#define Intake 4
 
 // Normalize angle to [-π, π]
 float normalizeAngle(float angle) {
@@ -85,21 +86,21 @@ float quadAngle(float t) {
   return t
 }
 
+
+
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
   float xi = Enes100.getX();
   float yi = Enes100.getY();
   float ti = normalizeAngle(Enes100.getTheta());
-  float dy = fabs(yf - yi);
-  float dx = fabs(xf - xi);
+  float dy = (yf - yi);
+  float dx = (xf - xi);
   long startTime = micros();
   long diffTime = 0;
   float P = 255;
 
   qA = quadAngle(ti);
   correctOrientation();
-
-  float tolerance = 0.1;  // Increased tolerance for linear movement
 
   // Moves robot in right direction based on cardinal direction
   if (qA == 3 * PI / 2) { // Robot facing up
@@ -245,7 +246,7 @@ void finish(float x) {
   moveHere(0.55, 1.87);
   moveHere(3.50, 1.87);
 }
-*/
+
 
 void motorCW (int m1, int m2, int p) {
   digitalWrite(m1, HIGH);
@@ -265,31 +266,34 @@ void motorStop (int m1, int m2) {
   digitalWrite(S, LOW);
 }
 
-void driveForwards (int p) {
-motorCCW(FRD1,FRD2, p);
-motorCW(FLD1,FLD2, p);
-motorCCW(BRD1,BRD2, p);
-motorCW(BLD1,BLD2, p);
-}
-void driveBackwards (int p) {
-motorCW(FRD1,FRD2, p);
-motorCCW(FLD1,FLD2, p);
-motorCW(BRD1,BRD2, p);
-motorCCW(BLD1,BLD2, p);
-}
-void strafeLeft (int p) {
-motorCCW(FRD1,FRD2, p);
-motorCW(BRD1,BRD2, p);
-motorCCW(FLD1,FLD2, p);
-motorCW(BLD1,BLD2, p);
-// check if it makes sense plss
+void driveOTV (int p) {
+  if (p < 0){
+    motorCW(FRD1,FRD2, p);
+    motorCCW(FLD1,FLD2, p);
+    motorCW(BRD1,BRD2, p);
+    motorCCW(BLD1,BLD2, p);
+  }
+  else () {
+    motorCCW(FRD1,FRD2, p);
+    motorCW(FLD1,FLD2, p);
+    motorCCW(BRD1,BRD2, p);
+    motorCW(BLD1,BLD2, p);
+  }
 }
 
-void strafeRight (int p) {
-motorCW(FRD1, FRD2, p);
-motorCCW(BRD1, BRD2, p);
-motorCW(FLD1, FLD2, p);
-motorCCW(BLD1, BLD2, p);
+void strafeOTV (int p) {
+  if (p < 0) {}
+    motorCCW(FRD1,FRD2, p);
+    motorCW(BRD1,BRD2, p);
+    motorCCW(FLD1,FLD2, p);
+    motorCW(BLD1,BLD2, p);
+  else {
+    motorCW(FRD1, FRD2, p);
+    motorCCW(BRD1, BRD2, p);
+    motorCW(FLD1, FLD2, p);
+    motorCCW(BLD1, BLD2, p);
+  }
+// check if it makes sense plss
 }
 
 void rotateOTV (int p) {
@@ -311,10 +315,10 @@ void rotateOTV (int p) {
 
 
 void stopotv () {
-motorStop(FRD1, FRD2);
-motorStop(FLD1, FLD2);
-motorStop(BRD1, BRD2);
-motorStop(BLD1, BLD2);
+  motorStop(FRD1, FRD2);
+  motorStop(FLD1, FLD2);
+  motorStop(BRD1, BRD2);
+  motorStop(BLD1, BLD2);
 }
 
 void setup() {
@@ -327,12 +331,15 @@ pinMode (FLD2, OUTPUT);
 pinMode (BLD1, OUTPUT);
 pinMode (BLD2, OUTPUT);
 pinMode (S, OUTPUT);
+pinMode (Intake, OUTPUT);
 Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 3, 2);
   delay(200);
   Enes100.print("Successfully connected to the Vision System");
+  digitalWrite(Intake, HIGH);
 }
 
 void loop() {
   correctOrientation(PI/2);
+  delay(100000000000000000000);
 }
   
