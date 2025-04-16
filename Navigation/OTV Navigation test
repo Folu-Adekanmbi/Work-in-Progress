@@ -43,7 +43,8 @@ int pd_drive_controller(float target_distance, float current_distance, float pre
     float kp = 1;
     float kd = 1;
     float error = target_distance - current_distance;
-    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
+    float derivative = 0;
+    if (diffTime > 0) derivative = (error - previous_error) / (((float)diffTime) / 1000000);
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
     if (control < 0) {
@@ -60,7 +61,8 @@ int pd_strafe_controller(float target_distance, float current_distance, float pr
     float kp = 1;
     float kd = 1;
     float error = target_distance - current_distance;
-    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
+    float derivative = 0;
+    if (diffTime > 0) derivative = (error - previous_error) / (((float)diffTime) / 1000000);
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
     if (control < 0) {
@@ -117,7 +119,7 @@ float quadrangle(float t) {
 void driveTo (float coordF, bool strafe, bool x){ 
   float coordi = 0;
   if (x) coordi = Enes100.getX();
-  else() coordi = Enes100.getY();
+  else coordi = Enes100.getY();
   float diffDist = coordF - coordi;
   long startTime = micros();
   long diffTime = 0;
@@ -125,13 +127,13 @@ void driveTo (float coordF, bool strafe, bool x){
   while (fabs(coordF - coordi) > 0.01) {
     diffTime = micros() - startTime;
     if (x) coordi = Enes100.getX();
-    else() coordi = Enes100.getY();
-    if (strafe) P = pd_strafe_controller(coordf, coordi, diffDist, diffTime);
-    else () P = pd_drive_controller(coordf, coordi, diffDist, diffTime);
+    else coordi = Enes100.getY();
+    if (strafe) P = pd_strafe_controller(coordF, coordi, diffDist, diffTime);
+    else P = pd_drive_controller(coordF, coordi, diffDist, diffTime);
     diffDist = coordF - coordi;
     startTime = micros();
-    if (strafe) strafeOTV();
-    else() driveOTV();
+    if (strafe) strafeOTV(P);
+    else driveOTV(P);
   }
   Enes100.println("I'm done driving!!!!!! :DDDDDDDDDDDDDDD");
   stopotv();
@@ -279,7 +281,7 @@ void moveHere(float xf, float yf) {
   delay(100);  // Small delay to allow motors to react
   stopotv();
 }
-*/
+
 
 void mission() {
   float y = Enes100.getY();
@@ -297,6 +299,7 @@ void finish(float x) {
   moveHere(0.55, 1.87);
   moveHere(3.50, 1.87);
 }
+*/
 
 
 void motorCW (int m1, int m2, int p) {
@@ -319,12 +322,14 @@ void motorStop (int m1, int m2) {
 
 void driveOTV (int p) {
   if (p < 0){
+    p = abs(p);
     motorCW(FRD1,FRD2, p);
     motorCCW(FLD1,FLD2, p);
     motorCW(BRD1,BRD2, p);
     motorCCW(BLD1,BLD2, p);
   }
-  else () {
+  else {
+    p = abs(p);
     motorCCW(FRD1,FRD2, p);
     motorCW(FLD1,FLD2, p);
     motorCCW(BRD1,BRD2, p);
@@ -333,12 +338,15 @@ void driveOTV (int p) {
 }
 
 void strafeOTV (int p) {
-  if (p < 0) {}
+  if (p < 0) {
+    p = abs(p);
     motorCCW(FRD1,FRD2, p);
     motorCW(BRD1,BRD2, p);
     motorCCW(FLD1,FLD2, p);
     motorCW(BLD1,BLD2, p);
+  }
   else {
+    p = abs(p);
     motorCW(FRD1, FRD2, p);
     motorCCW(BRD1, BRD2, p);
     motorCW(FLD1, FLD2, p);
@@ -363,7 +371,6 @@ void rotateOTV (int p) {
   }
 
 }
-
 
 void stopotv () {
   motorStop(FRD1, FRD2);
