@@ -96,26 +96,25 @@ void correctOrientation(float tf) {
 }
 
 /*
-float quadrangle(float t) {
-  t = fmod(t, PI*2);
-  if (t < 0) t+= 2*PI;
-  if (t >= PI / 4 && t < 3 * PI / 4) {    
+float cardinalAngle(float t) {
+  t = -PI
+  if (t >= -3 * PI / 4 && t <  -PI / 4) {    
+    t = -PI / 2;
+  }
+  else if (t >= -PI / 4 && t < PI / 4) {                         
+    t = 0;
+  }
+  else if (t >= PI / 4 && t < 3 * PI / 4) {               
     t = PI / 2;
   }
-  else if (t >= 3 * PI / 4 && t < 5 * PI / 4) {                         
-    t = PI;
-  }
-  else if (t >= t * PI / 4 && t < 7 * PI / 4) {               
-    t = 3 * PI / 2;
-  }
   else {
-    t = 0;
+    t = PI;
   }
   return t
 }
 */
 
-void driveTo (float coordF, bool strafe, bool x){ 
+void driveTo (bool x, float coordF, bool strafe){ 
   float coordi = 0;
   if (x) { // Checks X or Y
     coordi = Enes100.getX();
@@ -156,7 +155,7 @@ void driveTo (float coordF, bool strafe, bool x){
 /*
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
-
+  
   delay(100);  // Small delay to allow motors to react
   stopotv();
 }
