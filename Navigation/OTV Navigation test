@@ -21,7 +21,7 @@ float normalizeAngle(float angle) {
 }
 
 // Controls angular movement
-int pd_controller(float setpoint, float pv, float previous_error, long diffTime){
+int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
     float kp = 60;
     float kd = 17;
     float error = normalizeAngle(setpoint - pv);
@@ -83,7 +83,7 @@ void correctOrientation(float tf) {
   while (fabs(normalizeAngle(tf-ti)) > 0.02) {
     diffTime = micros() - startTime;
     ti = Enes100.getTheta();
-    P = pd_controller(tf, ti, dt, diffTime);
+    P = pd_angular_controller(tf, ti, dt, diffTime);
     dt = normalizeAngle(tf - ti);
     startTime = micros();
    // Enes100.println(dt);
