@@ -39,7 +39,7 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
 }
 
 // Controls forward/backward movement
-int pd_move_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
+int pd_drive_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
     float kp = 1;
     float kd = 1;
     float error = target_distance - current_distance;
@@ -90,10 +90,11 @@ void correctOrientation(float tf) {
     //Enes100.println(P);
     rotateOTV(P);
   }
-  Enes100.println("I'm done!!!!!! :DDDDDDDDDDDDDDD");
+  Enes100.println("I'm done rotating!!!!!! :DDDDDDDDDDDDDDD");
   stopotv();
 }
 
+/*
 float quadrangle(float t) {
   t = fmod(t, PI*2);
   if (t < 0) t+= 2*PI;
@@ -111,9 +112,34 @@ float quadrangle(float t) {
   }
   return t
 }
+*/
 
+void driveTo (float xf, float yf, bool strafe){
+  float distF = sqrt(xf^2 + yf^2);
+  float xi = Enes100.getX();
+  float yi = Enes100.getY();
+  float disti = sqrt((xi)^2 + (yi)^2);
+  float diffDist = distF - disti;
+  long startTime = micros();
+  long diffTime = 0;
+  float P = 255;
+  while (fabs(distF - disti) > 0.01) {
+    diffTime = micros() - startTime;
+    xi = Enes100.getX();
+    yi = Enes100.getY();
+    disti = sqrt((xi)^2 + (yi)^2);
+    if (strafe) P = pd_strafe_controller(distf, disti, diffDist, diffTime);
+    else () P = pd_drive_controller(distf, disti, diffDist, diffTime);
+    diffDist = distF - disti;
+    startTime = micros();
+    if (strafe) strafeOTV();
+    else() driveOTV();
+  }
+  Enes100.println("I'm done driving!!!!!! :DDDDDDDDDDDDDDD");
+  stopotv();
+}
 
-
+/*
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
   float xi = Enes100.getX();
@@ -255,6 +281,7 @@ void moveHere(float xf, float yf) {
   delay(100);  // Small delay to allow motors to react
   stopotv();
 }
+*/
 
 void mission() {
   float y = Enes100.getY();
