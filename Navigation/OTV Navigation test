@@ -37,7 +37,7 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
     return (int)control;
 }
 
-// Controls forward/backward movement
+// Controls driving movement
 int pd_drive_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
     float kp = 1;
     float kd = 1;
@@ -117,18 +117,33 @@ float quadrangle(float t) {
 
 void driveTo (float coordF, bool strafe, bool x){ 
   float coordi = 0;
-  if (x) coordi = Enes100.getX();
-  else coordi = Enes100.getY();
+  if (x) { // Checks X or Y
+    coordi = Enes100.getX();
+  }
+  else {
+    coordi = Enes100.getY();
+  }
+  
   float diffDist = coordF - coordi;
   long startTime = micros();
   long diffTime = 0;
   float P = 255;
+
+  // Sets pd controller for driving/strafing
   while (fabs(coordF - coordi) > 0.01) {
     diffTime = micros() - startTime;
-    if (x) coordi = Enes100.getX();
-    else coordi = Enes100.getY();
-    if (strafe) P = pd_strafe_controller(coordF, coordi, diffDist, diffTime);
-    else P = pd_drive_controller(coordF, coordi, diffDist, diffTime);
+    if (x) {
+      coordi = Enes100.getX();
+    }
+    else {
+      coordi = Enes100.getY();
+    }
+    if (strafe) {
+      P = pd_strafe_controller(coordF, coordi, diffDist, diffTime);
+    }
+    else {
+      P = pd_drive_controller(coordF, coordi, diffDist, diffTime);
+    }
     diffDist = coordF - coordi;
     startTime = micros();
     if (strafe) strafeOTV(P);
@@ -141,141 +156,6 @@ void driveTo (float coordF, bool strafe, bool x){
 /*
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
-  float xi = Enes100.getX();
-  float yi = Enes100.getY();
-  float ti = normalizeAngle(Enes100.getTheta());
-  float dy = (yf - yi);
-  float dx = (xf - xi);
-  long startTime = micros();
-  long diffTime = 0;
-  float P = 255;
-
-  qA = quadAngle(ti);
-  correctOrientation();
-
-  // Moves robot in right direction based on cardinal direction
-  if (qA == 3 * PI / 2) { // Robot facing up
-    if (dy != 0) { // Checks if needed to move along y 
-      while (dy > tolerance) {
-        diffTime = micros() - startTime;
-        yi = Enes100.getY();
-        P = pd_linear_controller(yf, yi, dy, diffTime);
-        startTime = micros();
-        dy = fabs(yf - yi);
-        if (yf > yi) { // Move up
-          driveForwards(P);
-        }
-        else { // Move down
-          driveBackwards(P);
-        }
-      }
-    }
-    if (dx != 0) { // Checks if needed to move along x 
-      while (dx > tolerance) {
-        diffTime = micros() - startTime;
-        xi = Enes100.getX();
-        P = pd_linear_controller(xf, xi, dx, diffTime);
-        startTime = micros();
-        dx = fabs(xf - xi);
-        if (xf > xi) { // Move right
-          strafeRight(P);
-        }
-        else { // Move left
-          strafeLeft(P);
-        }
-      }
-    }
-  }
-  else if (qA == PI) { // Robot facing right
-    if (yf != yi) { // Checks if needed to move along y
-      if (yf > yi) { // Move up
-        strafeLeft(255);
-        while (fabs(yf - yi) > tolerance) {
-          yi = Enes100.getY();
-        }
-      }
-      else { // Move down
-        strafeRight(255);
-        while (fabs(yf - yi) > tolerance) {
-          yi = Enes100.getY();
-        }
-      }
-    }
-    if (xf != xi) { // Checks if needed to move along x 
-      if (xf > xi) { // Move right
-        driveForwards(255);
-        while (fabs(xf - xi) > tolerance) {
-          xi = Enes100.getX();
-        }
-      }
-      else { // Move left
-        driveBackwards(255);
-        while(fabs(xf - xi) > tolerance) {
-          xi = Enes100.getX();
-        }
-      }
-    }
-  }
-  else if (qA == PI / 2) { // Robot facing down
-    if (yf != yi) { // Checks if needed to move along y
-      if (yf > yi) { // Move up
-        driveBackwards(255);
-        while (fabs(yf - yi) > tolerance) {
-          yi = Enes100.getY();
-        }
-      }
-      else { // Move down
-        driveForwards(255);
-        while (fabs(yf - yi) > tolerance) {
-          yi = Enes100.getY();
-        }
-      }
-    }
-    if (xf != xi) { // Checks if needed to move along x 
-      if (xf > xi) { // Move right
-        strafeLeft(255);
-        while (fabs(xf - xi) > tolerance) {
-          xi = Enes100.getX();
-        }
-      }
-      else { // Move left
-        strafeRight(255);
-        while(fabs(xf - xi) > tolerance) {
-          xi = Enes100.getX();
-        }
-      }
-    }
-  }
-  else { // Robot facing left
-    if (yf != yi) { // Checks if needed to move along y
-      if (yf > yi) { // Move up
-        strafeRight(255);
-        while (fabs(yf - yi) > tolerance) {
-          yi = Enes100.getY();
-        }
-      }
-      else { // Move down
-        strafeLeft(255);
-        while (fabs(yf - yi) > tolerance) {
-          yi = Enes100.getY();
-        }
-      }
-    }
-    if (xf != xi) { // Checks if needed to move along x 
-      if (xf > xi) { // Move right
-        driveBackwards(255);
-        while (fabs(xf - xi) > tolerance) {
-          xi = Enes100.getX();
-        }
-      }
-      else { // Move left
-        driveForwards(255);
-        while(fabs(xf - xi) > tolerance) {
-          xi = Enes100.getX();
-        }
-      }
-    }
-  }
 
   delay(100);  // Small delay to allow motors to react
   stopotv();
