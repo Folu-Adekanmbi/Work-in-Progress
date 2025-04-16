@@ -70,7 +70,9 @@ void correctOrientation(float tf) {
   stopotv();
 }
 
-float quadAngle(float t) {
+float quadrangle(float t) {
+  t = fmod(t, PI*2);
+  if (t < 0) t+= 2*PI;
   if (t >= PI / 4 && t < 3 * PI / 4) {    
     t = PI / 2;
   }
