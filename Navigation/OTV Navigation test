@@ -10,7 +10,6 @@
 #define BLD1 12
 #define BLD2 13
 #define S 9
-#define Intake 4
 
 // Normalize angle to [-π, π]
 float normalizeAngle(float angle) {
@@ -389,11 +388,9 @@ pinMode (FLD2, OUTPUT);
 pinMode (BLD1, OUTPUT);
 pinMode (BLD2, OUTPUT);
 pinMode (S, OUTPUT);
-pinMode (Intake, OUTPUT);
 Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 3, 2);
   delay(200);
   Enes100.print("Successfully connected to the Vision System");
-  digitalWrite(Intake, HIGH);
 }
 
 void loop() {
