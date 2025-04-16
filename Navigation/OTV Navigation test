@@ -395,6 +395,7 @@ Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 3, 2);
 
 void loop() {
   correctOrientation(PI/2);
+  driveTo(2, false, True);
   delay(100000000000000000000);
 }
   
