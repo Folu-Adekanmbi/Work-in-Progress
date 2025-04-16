@@ -38,14 +38,38 @@ int pd_controller(float setpoint, float pv, float previous_error, long diffTime)
     return (int)control;
 }
 
-// Controls linear movement
-int pd_linear_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
+// Controls forward/backward movement
+int pd_move_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
     float kp = 1;
     float kd = 1;
-    float error = fabs(target_distance - current_distance);
-    float derivative = (error - previous_error) / ((float)diffTime);
+    float error = target_distance - current_distance;
+    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
     float control = kp * error + kd * derivative;
-    return control;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    return (int)control;
+}
+
+// Controls strafe movement
+int pd_strafe_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
+    float kp = 1;
+    float kd = 1;
+    float error = target_distance - current_distance;
+    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
+    float control = kp * error + kd * derivative;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    return (int)control;
 }
 
 // Angle correction to a set angle
