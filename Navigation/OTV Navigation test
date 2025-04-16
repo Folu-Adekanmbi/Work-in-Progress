@@ -24,9 +24,9 @@ float normalizeAngle(float angle) {
 int pd_controller(float setpoint, float pv, float previous_error, long diffTime){
     float kp = 60;
     float kd = 17;
-    float error = setpoint - pv;
+    float error = normalizeAngle(setpoint - pv);
     float derivative = 0;
-    if (diffTime > 0) derivative = ((error - previous_error) / (((float)diffTime) / 1000000));
+    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
     if (control < 0) {
@@ -52,15 +52,15 @@ int pd_linear_controller(float target_distance, float current_distance, float pr
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
   float ti = Enes100.getTheta();
-  float dt = tf - ti;
+  float dt = normalizeAngle(tf - ti);
   long startTime = micros();
   long diffTime = 0;
   float P = 0;
-  while (abs(tf-ti) > 0.02) {
+  while (fabs(normalizeAngle(tf-ti)) > 0.02) {
     diffTime = micros() - startTime;
     ti = Enes100.getTheta();
     P = pd_controller(tf, ti, dt, diffTime);
-    dt = (tf - ti);
+    dt = normalizeAngle(tf - ti);
     startTime = micros();
    // Enes100.println(dt);
     //Enes100.println(P);
