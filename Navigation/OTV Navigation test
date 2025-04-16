@@ -155,7 +155,16 @@ void driveTo (bool x, float coordF, bool strafe){
 /*
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
-  
+  correctOrientation(cardinalAngle);
+ 
+  if (cardinalAngle == PI / 2 || cardinalAngle == -PI/2) { // Facing N or S
+    driveTo (True, xf, True);
+    driveTo (False, yf, False);
+  }
+  else { // Facing W or E
+    driveTo (True, xf, False);
+    driveTo (False, yf, True);
+  }
   delay(100);  // Small delay to allow motors to react
   stopotv();
 }
