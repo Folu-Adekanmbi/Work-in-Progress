@@ -114,23 +114,21 @@ float quadrangle(float t) {
 }
 */
 
-void driveTo (float xf, float yf, bool strafe){
-  float distF = sqrt(xf^2 + yf^2);
-  float xi = Enes100.getX();
-  float yi = Enes100.getY();
-  float disti = sqrt((xi)^2 + (yi)^2);
-  float diffDist = distF - disti;
+void driveTo (float coordF, bool strafe, bool x){ 
+  float coordi = 0;
+  if (x) coordi = Enes100.getX();
+  else() coordi = Enes100.getY();
+  float diffDist = coordF - coordi;
   long startTime = micros();
   long diffTime = 0;
   float P = 255;
-  while (fabs(distF - disti) > 0.01) {
+  while (fabs(coordF - coordi) > 0.01) {
     diffTime = micros() - startTime;
-    xi = Enes100.getX();
-    yi = Enes100.getY();
-    disti = sqrt((xi)^2 + (yi)^2);
-    if (strafe) P = pd_strafe_controller(distf, disti, diffDist, diffTime);
-    else () P = pd_drive_controller(distf, disti, diffDist, diffTime);
-    diffDist = distF - disti;
+    if (x) coordi = Enes100.getX();
+    else() coordi = Enes100.getY();
+    if (strafe) P = pd_strafe_controller(coordf, coordi, diffDist, diffTime);
+    else () P = pd_drive_controller(coordf, coordi, diffDist, diffTime);
+    diffDist = coordF - coordi;
     startTime = micros();
     if (strafe) strafeOTV();
     else() driveOTV();
