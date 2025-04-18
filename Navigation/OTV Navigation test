@@ -47,10 +47,10 @@ int pd_drive_controller(float target_distance, float current_distance, float pre
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
     if (control < 0) {
-      if (fabs(control) <= 40) control = -40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+      if (fabs(control) <= 55) control = -55; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
     }
     if (control > 0) {
-      if (fabs(control) <= 40) control = 40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+      if (fabs(control) <= 55) control = 55; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
     }
     return (int)control;
 }
@@ -65,10 +65,10 @@ int pd_strafe_controller(float target_distance, float current_distance, float pr
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
     if (control < 0) {
-      if (fabs(control) <= 40) control = -40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+      if (fabs(control) <= 50) control = -50; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
     }
     if (control > 0) {
-      if (fabs(control) <= 40) control = 40; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+      if (fabs(control) <= 50) control = 50; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
     }
     return (int)control;
 }
@@ -151,7 +151,7 @@ void driveTo (bool x, float coordF, bool strafe){
   Enes100.println("I'm done driving!!!!!! :DDDDDDDDDDDDDDD");
   stopotv();
 }
-
+/*
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
   correctOrientation(cardinalAngle);
@@ -167,6 +167,7 @@ void moveHere(float xf, float yf) {
   delay(100);  // Small delay to allow motors to react
   stopotv();
 }
+*/
 
 /*
 void mission() {
@@ -275,14 +276,22 @@ pinMode (FLD2, OUTPUT);
 pinMode (BLD1, OUTPUT);
 pinMode (BLD2, OUTPUT);
 pinMode (S, OUTPUT);
-Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 3, 2);
+Enes100.begin("Work in Progress", MATERIAL, 495, 1120, 3, 2);
   delay(200);
   Enes100.print("Successfully connected to the Vision System");
 }
 
 void loop() {
-  correctOrientation(PI/2);
-  driveTo(2, false, True);
-  delay(100000000000000000000);
+  bool v = Enes100.isVisible();
+  bool v1 = Enes100.isConnected();
+  if (v1 && v){
+    delay(2000);
+    Enes100.println("Beep Boop execuing commands");
+    correctOrientation(PI/2);
+    driveTo(false, 1, true);
+    delay(100000000000000000000);
+  }
+  
+  
 }
   
