@@ -148,9 +148,37 @@ void driveTo (bool x, float coordF, bool strafe){
     if (strafe) strafeOTV(P);
     else driveOTV(P);
   }
-  Enes100.println("I'm done driving!!!!!! :DDDDDDDDDDDDDDD");
   stopotv();
 }
+
+void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment){
+  float coordi = 0;
+  if (x) {
+      coordi = Enes100.getX();
+  }
+  else {
+      coordi = Enes100.getY();
+  }
+  while(coordi != coordF){
+    correctOrientation(angle);
+    driveTo (x, coordi, strafe);
+    if (x) {
+      coordi = Enes100.getX();
+    }
+    else {
+      coordi = Enes100.getY();
+    }
+    if (coordF < coordi){
+       coordi -= increment;
+    } else if (coordF > coordi){
+      coordi += increment;
+    } else {
+      coordi = coordF;
+    }
+  }
+  Enes100.println("I'm done driving!!!!!! :DDDDDDDDDDDDDDD");
+}
+
 /*
 // Moves to specific coordinates
 void moveHere(float xf, float yf) {
