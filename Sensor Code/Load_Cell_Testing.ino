@@ -58,3 +58,7 @@ void loop() {
 
   delay(5000);
 }
+
+//Create function called weight where Tare runs once, then use reading over weight value to create scale factor, then multiply scale factor by load cell reading
+//Create an if else statement that determines if it's light, medium, or heavy then let ENES100 print to vision monitor whether it's light, medium, or heavy
+//Create if else function using readings
