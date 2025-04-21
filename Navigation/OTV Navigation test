@@ -1,4 +1,5 @@
 #include <Enes100.h>
+#include "HX711.h"
 
 //F is front, B is back, R is right, L is left, D is drive, S is speed for these pin assignments
 #define FRD1 8
@@ -10,6 +11,20 @@
 #define BLD1 12
 #define BLD2 13
 #define S 9
+// HX711 circuit wiring
+#define LOADCELL_DOUT_PIN 4
+#define LOADCELL_SCK_PIN 5
+HX711 scale;
+
+//Mission Objectives 
+ float weigh(){
+  scale.tare();
+  float scaleFactor = 1; //Test and throw in the real value
+  float weight = scale.get_value(5);
+  weight = weight * scaleFactor;
+  return weight;
+}
+
 
 // Normalize angle to [-π, π]
 float normalizeAngle(float angle) {
@@ -304,6 +319,8 @@ pinMode (FLD2, OUTPUT);
 pinMode (BLD1, OUTPUT);
 pinMode (BLD2, OUTPUT);
 pinMode (S, OUTPUT);
+Serial.begin(57600);
+scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
 Enes100.begin("Work in Progress", MATERIAL, 495, 1120, 3, 2);
   delay(200);
   Enes100.print("Successfully connected to the Vision System");
