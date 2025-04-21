@@ -39,7 +39,7 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
 
 // Controls driving movement
 int pd_drive_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
-    float kp = 1;
+    float kp = 10;
     float kd = 1;
     float error = target_distance - current_distance;
     float derivative = 0;
@@ -57,7 +57,7 @@ int pd_drive_controller(float target_distance, float current_distance, float pre
 
 // Controls strafe movement
 int pd_strafe_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
-    float kp = 1;
+    float kp = 10;
     float kd = 1;
     float error = target_distance - current_distance;
     float derivative = 0;
@@ -313,10 +313,9 @@ void loop() {
   bool v = Enes100.isVisible();
   bool v1 = Enes100.isConnected();
   if (v1 && v){
-    delay(2000);
+    delay(5000);
     Enes100.println("Beep Boop execuing commands");
-    correctOrientation(PI/2);
-    driveTo(false, 1, true);
+    incrementalDrive(false, 1, true, PI/2, 0.01);
     delay(100000000000000000000);
   }
   
