@@ -36,8 +36,8 @@ float normalizeAngle(float angle) {
 
 // Controls angular movement
 int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
-    float kp = 60;
-    float kd = 17;
+    float kp = 70;
+    float kd = 50;
     float error = normalizeAngle(setpoint - pv);
     float derivative = 0;
     if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
@@ -54,8 +54,8 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
 
 // Controls driving movement
 int pd_drive_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
-    float kp = 10;
-    float kd = 1;
+    float kp = 100;
+    float kd = 0;
     float error = target_distance - current_distance;
     float derivative = 0;
     if (diffTime > 0) derivative = (error - previous_error) / (((float)diffTime) / 1000000);
@@ -72,8 +72,8 @@ int pd_drive_controller(float target_distance, float current_distance, float pre
 
 // Controls strafe movement
 int pd_strafe_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
-    float kp = 10;
-    float kd = 1;
+    float kp = 8;
+    float kd = 4;
     float error = target_distance - current_distance;
     float derivative = 0;
     if (diffTime > 0) derivative = (error - previous_error) / (((float)diffTime) / 1000000);
@@ -96,7 +96,7 @@ void correctOrientation(float tf) {
   long startTime = micros();
   long diffTime = 0;
   float P = 0;
-  while (fabs(normalizeAngle(tf-ti)) > 0.02) {
+  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
     diffTime = micros() - startTime;
     ti = Enes100.getTheta();
     P = pd_angular_controller(tf, ti, dt, diffTime);
