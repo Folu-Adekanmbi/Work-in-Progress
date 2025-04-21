@@ -1,3 +1,35 @@
+//void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
+//correctOrientation(float tf)
 void mission() {
-    
+//Start orientatiopn and movement towards payload
+if (y < 1) {
+    correctOrientation(0);
+    incrementalDrive (False, 1.87, False, 0, 0.01); // testing coordinate 2 
+  } 
+  else {
+    correctOrientation(PI);
+     incrementalDrive (False, 0, False, PI, 0.01);
+  }
+
+delay (1000) // delaying by a second before fufilling mission objectives 
+// Fulfill mission Stuff 
+//void weigh(){ //run weight funtion 
+
+}
+ // run material identification using piezo
+
+if (y < 1) {
+    incrementalDrive (False, 1.87, False, 0, 0.01);
+    incrementalDrive (True, 3.3, True, 0, 0.01); // Testing out if 3.3 x-coordinate for right in front of limbo
+}
+else {
+    incrementalDrive (True, 3.3, True, 0, 0.01); 
+}
+// Aligning to the front of the limbo
+
+incrementalDrive (False, 1.6, False, 0, 0.01); // moving under LiMbO
+incrementalDrive (True, 3.8, True, 0, 0.01);
+}
+
+
 }
