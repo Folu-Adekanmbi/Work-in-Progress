@@ -324,6 +324,9 @@ scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
 Enes100.begin("Work in Progress", MATERIAL, 495, 1120, 3, 2);
   delay(200);
   Enes100.print("Successfully connected to the Vision System");
+// for piezo to ensure that the piezo reads it with time delays cause it reads things to quickly
+ Serial.begin(115200);
+    ADCSRA = (ADCSRA & B11111000) | B00000010; // Set ADC prescaler to 16 (125 kHz ADC clock)
 }
 
 void loop() {
