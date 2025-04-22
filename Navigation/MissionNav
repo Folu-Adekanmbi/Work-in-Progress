@@ -17,7 +17,14 @@ delay (1000) // delaying by a second before fufilling mission objectives
 // Testing weight 
 if (weight <= 2) { // using the weight of two as a place holder 
 Enes100.print("LIGHT!");
+}
 
+else if (weight = 3 ) { // using the weigh three as place holder fro medium 
+Enes100.print("MEDIUM!");
+}
+
+else () {
+Enes100.print("HEAVY!");
 }
 
 
