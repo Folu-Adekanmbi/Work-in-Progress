@@ -1,0 +1,343 @@
+#include <Enes100.h>
+#include "HX711.h"
+
+//F is front, B is back, R is right, L is left, D is drive, S is speed for these pin assignments
+#define FRD1 8
+#define FRD2 7
+#define FLD1 10
+#define FLD2 11
+#define BRD1 6
+#define BRD2 5
+#define BLD1 12
+#define BLD2 13
+#define S 9
+// HX711 circuit wiring
+#define LOADCELL_DOUT_PIN 4
+#define LOADCELL_SCK_PIN 5
+HX711 scale;
+
+//Mission Objectives 
+ float weigh(){
+  scale.tare();
+  float scaleFactor = 1; //Test and throw in the real value
+  float weight = scale.get_value(5);
+  weight = weight * scaleFactor;
+  return weight;
+}
+
+
+// Normalize angle to [-π, π]
+float normalizeAngle(float angle) {
+  angle = fmod(angle, 2*PI);
+  if (angle > PI) angle -= 2 * PI;
+  if (angle < -PI) angle += 2 * PI;
+  return angle;
+}
+
+// Controls angular movement
+int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
+    float kp = 70;
+    float kd = 50;
+    float error = normalizeAngle(setpoint - pv);
+    float derivative = 0;
+    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
+    float control = kp * error + kd * derivative;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; 
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40;
+    }
+    return (int)control;
+}
+
+// Controls driving movement
+int pd_drive_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
+    float kp = 100;
+    float kd = 0;
+    float error = target_distance - current_distance;
+    float derivative = 0;
+    if (diffTime > 0) derivative = (error - previous_error) / (((float)diffTime) / 1000000);
+    float control = kp * error + kd * derivative;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 55) control = -55; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    if (control > 0) {
+      if (fabs(control) <= 55) control = 55; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    return (int)control;
+}
+
+// Controls strafe movement
+int pd_strafe_controller(float target_distance, float current_distance, float previous_error, long diffTime) {
+    float kp = 8;
+    float kd = 4;
+    float error = target_distance - current_distance;
+    float derivative = 0;
+    if (diffTime > 0) derivative = (error - previous_error) / (((float)diffTime) / 1000000);
+    float control = kp * error + kd * derivative;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 50) control = -50; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    if (control > 0) {
+      if (fabs(control) <= 50) control = 50; //Alter these values to be a value just below the minimum PWM for all motors to move the OTV
+    }
+    return (int)control;
+}
+
+// Angle correction to a set angle
+void correctOrientation(float tf) {
+  tf = normalizeAngle(tf);
+  float ti = Enes100.getTheta();
+  float dt = normalizeAngle(tf - ti);
+  long startTime = micros();
+  long diffTime = 0;
+  float P = 0;
+  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
+    diffTime = micros() - startTime;
+    ti = Enes100.getTheta();
+    P = pd_angular_controller(tf, ti, dt, diffTime);
+    dt = normalizeAngle(tf - ti);
+    startTime = micros();
+   // Enes100.println(dt);
+    //Enes100.println(P);
+    rotateOTV(P);
+  }
+  Enes100.println("I'm done rotating!!!!!! :DDDDDDDDDDDDDDD");
+  stopotv();
+}
+
+void driveTo (bool x, float coordF, bool strafe){ 
+  float coordi = 0;
+  if (x) { // Checks X or Y
+    coordi = Enes100.getX();
+  }
+  else {
+    coordi = Enes100.getY();
+  }
+  
+  float diffDist = coordF - coordi;
+  long startTime = micros();
+  long diffTime = 0;
+  float P = 255;
+
+  // Sets pd controller for driving/strafing
+  while (fabs(coordF - coordi) > 0.01) {
+    diffTime = micros() - startTime;
+    if (x) {
+      coordi = Enes100.getX();
+    }
+    else {
+      coordi = Enes100.getY();
+    }
+    if (strafe) {
+      P = pd_strafe_controller(coordF, coordi, diffDist, diffTime);
+    }
+    else {
+      P = pd_drive_controller(coordF, coordi, diffDist, diffTime);
+    }
+    diffDist = coordF - coordi;
+    startTime = micros();
+    if (strafe) strafeOTV(P);
+    else driveOTV(P);
+  }
+  stopotv();
+}
+
+void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment){
+  float coordi = 0;
+  if (x) {
+      coordi = Enes100.getX();
+  }
+  else {
+      coordi = Enes100.getY();
+  }
+  while(coordi != coordF){
+    correctOrientation(angle);
+    driveTo (x, coordi, strafe);
+    if (x) {
+      coordi = Enes100.getX();
+    }
+    else {
+      coordi = Enes100.getY();
+    }
+    if (coordF < coordi){
+       coordi -= increment;
+    } else if (coordF > coordi){
+      coordi += increment;
+    } else {
+      coordi = coordF;
+    }
+  }
+  Enes100.println("I'm done driving!!!!!! :DDDDDDDDDDDDDDD");
+}
+
+
+void motorCW (int m1, int m2, int p) {
+  digitalWrite(m1, HIGH);
+  digitalWrite(m2, LOW);
+  analogWrite(S, p);
+}
+
+void motorCCW (int m1, int m2, int p) {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, HIGH);
+  analogWrite(S, p);
+}
+
+void motorStop (int m1, int m2) {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, LOW);
+  digitalWrite(S, LOW);
+}
+
+void driveOTV (int p) {
+  if (p < 0){
+    p = abs(p);
+    motorCW(FRD1,FRD2, p);
+    motorCCW(FLD1,FLD2, p);
+    motorCW(BRD1,BRD2, p);
+    motorCCW(BLD1,BLD2, p);
+  }
+  else {
+    p = abs(p);
+    motorCCW(FRD1,FRD2, p);
+    motorCW(FLD1,FLD2, p);
+    motorCCW(BRD1,BRD2, p);
+    motorCW(BLD1,BLD2, p);
+  }
+}
+
+void strafeOTV (int p) {
+  if (p < 0) {
+    p = abs(p);
+    motorCCW(FRD1,FRD2, p);
+    motorCW(BRD1,BRD2, p);
+    motorCCW(FLD1,FLD2, p);
+    motorCW(BLD1,BLD2, p);
+  }
+  else {
+    p = abs(p);
+    motorCW(FRD1, FRD2, p);
+    motorCCW(BRD1, BRD2, p);
+    motorCW(FLD1, FLD2, p);
+    motorCCW(BLD1, BLD2, p);
+  }
+// check if it makes sense plss
+}
+
+void rotateOTV (int p) {
+  if (p < 0) {
+    p = abs(p);
+    motorCW(FRD1, FRD2, p);
+    motorCW(FLD1, FLD2, p);
+    motorCW(BRD1, BRD2, p);
+    motorCW(BLD1, BLD2, p);
+  } else {
+    p = abs(p);
+    motorCCW(FRD1, FRD2, p);
+    motorCCW(FLD1, FLD2, p);
+    motorCCW(BRD1, BRD2, p);
+    motorCCW(BLD1, BLD2, p);
+  }
+
+}
+
+void stopotv () {
+  motorStop(FRD1, FRD2);
+  motorStop(FLD1, FLD2);
+  motorStop(BRD1, BRD2);
+  motorStop(BLD1, BLD2);
+}
+
+void setup() {
+pinMode (FRD1, OUTPUT);
+pinMode (FRD2, OUTPUT);
+pinMode (BRD1, OUTPUT);
+pinMode (BRD2, OUTPUT);
+pinMode (FLD1, OUTPUT);
+pinMode (FLD2, OUTPUT);
+pinMode (BLD1, OUTPUT);
+pinMode (BLD2, OUTPUT);
+pinMode (S, OUTPUT);
+Serial.begin(57600);
+scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
+Enes100.begin("Work in Progress", MATERIAL, 495, 1120, 3, 2);
+  delay(200);
+  Enes100.print("Successfully connected to the Vision System");
+// for piezo to ensure that the piezo reads it with time delays cause it reads things to quickly
+ Serial.begin(115200);
+    ADCSRA = (ADCSRA & B11111000) | B00000010; // Set ADC prescaler to 16 (125 kHz ADC clock)
+}
+
+void loop() {
+  bool v = Enes100.isVisible();
+  bool v1 = Enes100.isConnected();
+  if (v1 && v){
+    delay(5000);
+    Enes100.println("Beep Boop execuing commands");
+    incrementalDrive(false, 1, true, PI/2, 0.01);
+    delay(100000000000000000000);
+  }
+  
+  
+}
+int y = 0; // Assuming some identifier like robot team number
+
+void mission() {
+  float payloadWeight = weigh();
+
+  if (y < 1) {
+    correctOrientation(0);
+    incrementalDrive(false, 1.87, false, 0, 0.01); 
+  } else {
+    correctOrientation(PI);
+    incrementalDrive(false, 0, false, PI, 0.01);
+  }
+
+  delay(1000); // Pause before executing objective logic
+
+  // Print based on weight
+  if (payloadWeight <= 2) {
+    Enes100.print("LIGHT!");
+  }
+  else if (payloadWeight == 3) {
+    Enes100.print("MEDIUM!");
+  }
+  else {
+    Enes100.print("HEAVY!");
+  }
+
+  // Piezo material detection
+  const int piezoPin = A5;
+  const int plasticThreshold = 850;
+  const int foamThreshold = 650;
+  int piezoValue = analogRead(piezoPin);
+
+  if (piezoValue > plasticThreshold) {
+    Enes100.print("PLASTIC");
+  } 
+  else if (piezoValue > foamThreshold) {
+    Enes100.print("FOAM");
+  } 
+  else {
+    Enes100.print("NOTHING");
+  }
+
+  delay(100);
+
+  // Drive back
+  if (y < 1) {
+    incrementalDrive(false, 1.87, false, 0, 0.01);
+    incrementalDrive(true, 3.3, true, 0, 0.01);
+  } else {
+    incrementalDrive(true, 3.3, true, 0, 0.01);
+  }
+
+  // Final alignment
+  incrementalDrive(false, 1.6, false, 0, 0.01);
+  incrementalDrive(true, 3.8, true, 0, 0.01);
+}
