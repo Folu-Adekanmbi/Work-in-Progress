@@ -1,1 +1,74 @@
+//
+const int piezoPin = A5;
+const int plasticThreshold = 850; // Higher value for plastic due to stronger vibrations 850 is placeholder
+const int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
 
+// void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
+// correctOrientation(float tf)
+
+void mission() {
+//Start orientation and movement towards payload
+if (y < 1) {
+    correctOrientation(0);
+    incrementalDrive (False, 1.87, False, 0, 0.01); // testing coordinate 2 
+  } 
+  else {
+    correctOrientation(PI);
+     incrementalDrive (False, 0, False, PI, 0.01);
+  }
+
+delay (1000) // delaying by a second before fufilling mission objectives 
+
+// Fulfill mission Stuff 
+
+// Testing weight 
+if (weight <= 2) { // using the weight of two as a place holder 
+Enes100.print("LIGHT!");
+}
+else if (weight <= 3 ) { // using the weigh three as place holder fro medium 
+Enes100.print("MEDIUM!");
+}
+else () {
+Enes100.print("HEAVY!");
+}
+
+delay(100); // Short delay to ensure multiple readings
+
+// run material identification using piezo
+  int piezoValue = analogRead(piezoPin); // Piezo reads values from 512-1023
+
+  //Compares piezo reading to each threshold to determine material
+  if (piezoValue > plasticThreshold) {
+    Serial.println("PLASTIC");
+  } 
+  else if (piezoValue > foamThreshold) {
+    Serial.println("FOAM");
+  }
+  else {
+    Serial.println("NOTHING");
+  }
+    
+  delay(100); // Short delay to ensure multiple readings
+}
+}
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+
+//Code to drive otv back to the limbo after mission indentification
+
+if (y < 1) {
+    incrementalDrive (False, 1.87, False, 0, 0.01);
+    incrementalDrive (True, 3.3, True, 0, 0.01); // Testing out if 3.3 x-coordinate for right in front of limbo
+}
+else {
+    incrementalDrive (True, 3.3, True, 0, 0.01); 
+}
+// Aligning to the front of the limbo
+
+incrementalDrive (False, 1.6, False, 0, 0.01); // moving under LiMbO
+incrementalDrive (True, 3.8, True, 0, 0.01);
+}
