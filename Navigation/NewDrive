@@ -35,6 +35,29 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
     return (int)control;
 }
 
+// Angle correction to a set angle
+void correctOrientation(float tf) {
+  tf = normalizeAngle(tf);
+  float ti = Enes100.getTheta();
+  float dt = normalizeAngle(tf - ti);
+  long startTime = micros();
+  long diffTime = 0;
+  float P = 0;
+  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
+    diffTime = micros() - startTime;
+    ti = Enes100.getTheta();
+    P = pd_angular_controller(tf, ti, dt, diffTime);
+    dt = normalizeAngle(tf - ti);
+    startTime = micros();
+   // Enes100.println(dt);
+    //Enes100.println(P);
+    rotateOTV(P);
+  }
+  Enes100.println("I'm done rotating!!!!!! :DDDDDDDDDDDDDDD");
+  stopotv();
+}
+
+
 //power should be given in range [-1, 1] which corresponds to max speed and minimum speed, 0 is stop
 void setMotorPower(int motor, float power) { //Input motor name either FL, FR, BL, BR and power calculated from set driver power
   // Constrain the power to be between -1 and 1
