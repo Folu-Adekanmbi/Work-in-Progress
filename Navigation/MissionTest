@@ -1,10 +1,35 @@
-//
+#include <Arduino.h>
+#include "HX711.h"
+#include <Enes100.
+
+// HX711 circuit wiring
+const int LOADCELL_DOUT_PIN = 4;
+const int LOADCELL_SCK_PIN = 5;
+
+// piezo const
 const int piezoPin = A5;
 const int plasticThreshold = 850; // Higher value for plastic due to stronger vibrations 850 is placeholder
 const int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
 
 // void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
 // correctOrientation(float tf)
+
+// weight function
+void weight() {
+  float w = scale.get_units(5);   // Average of 5 readings
+
+  if (w <= 105) {
+    Enes100.print("LIGHT!");
+  }
+  else if (w <= 205) {
+    Enes100.print("MEDIUM!");
+  }
+  else {
+    Enes100.print("HEAVY!");
+  }
+
+  delay(100);
+}
 
 void mission() {
 //Start orientation and movement towards payload
@@ -21,19 +46,6 @@ delay (1000) // delaying by a second before fufilling mission objectives
 
 // Fulfill mission Stuff 
 
-// Testing weight 
-if (weight <= 2) { // using the weight of two as a place holder 
-Enes100.print("LIGHT!");
-}
-else if (weight <= 3 ) { // using the weigh three as place holder fro medium 
-Enes100.print("MEDIUM!");
-}
-else () {
-Enes100.print("HEAVY!");
-}
-
-delay(100); // Short delay to ensure multiple readings
-
 // run material identification using piezo
   int piezoValue = analogRead(piezoPin); // Piezo reads values from 512-1023
 
@@ -49,11 +61,29 @@ delay(100); // Short delay to ensure multiple readings
   }
     
   delay(100); // Short delay to ensure multiple readings
+
+// Testing weight 
+if (weight <= 2) { // using the weight of two as a place holder 
+Enes100.print("LIGHT!");
 }
+else if (weight <= 3 ) { // using the weigh three as place holder fro medium 
+Enes100.print("MEDIUM!");
+}
+else () {
+Enes100.print("HEAVY!");
+}
+
+delay(100); // Short delay to ensure multiple readings
 }
 
 void setup() {
   Serial.begin(9600);
+  Enes100.begin();              // Assuming Enes100 is your display or output device
+
+  scale.begin(DOUT, CLK);       // Initialize HX711 with correct pins
+  scale.set_scale();        // Set your calibrated scale factor
+  scale.tare();                 // Zero the scale (should be empty)
+  Serial.println("Scale initialized.");
 }
 
 void loop() {
