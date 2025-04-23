@@ -17,6 +17,24 @@ const float positionTolerance = 0.05;
 const float thetaTolerance = 0.05;
 //const unsigned long updateInterval = 20; // microseconds
 
+// Controls angular movement
+int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
+    float kp = 70;
+    float kd = 50;
+    float error = normalizeAngle(setpoint - pv);
+    float derivative = 0;
+    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
+    float control = kp * error + kd * derivative;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; 
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40;
+    }
+    return (int)control;
+}
+
 //power should be given in range [-1, 1] which corresponds to max speed and minimum speed, 0 is stop
 void setMotorPower(int motor, float power) { //Input motor name either FL, FR, BL, BR and power calculated from set driver power
   // Constrain the power to be between -1 and 1
