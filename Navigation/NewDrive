@@ -35,6 +35,23 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
     return (int)control;
 }
 
+void rotateOTV (int p) {
+  if (p < 0) {
+    p = abs(p);
+    motorCW(FRD1, FRD2, p);
+    motorCW(FLD1, FLD2, p);
+    motorCW(BRD1, BRD2, p);
+    motorCW(BLD1, BLD2, p);
+  } else {
+    p = abs(p);
+    motorCCW(FRD1, FRD2, p);
+    motorCCW(FLD1, FLD2, p);
+    motorCCW(BRD1, BRD2, p);
+    motorCCW(BLD1, BLD2, p);
+  }
+
+}
+
 void motorCW (int m1, int m2, int p) {
   digitalWrite(m1, HIGH);
   digitalWrite(m2, LOW);
