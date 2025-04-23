@@ -1,7 +1,7 @@
-//void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
-//correctOrientation(float tf)
+// void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
+// correctOrientation(float tf)
 void mission() {
-//Start orientatiopn and movement towards payload
+//Start orientation and movement towards payload
 if (y < 1) {
     correctOrientation(0);
     incrementalDrive (False, 1.87, False, 0, 0.01); // testing coordinate 2 
