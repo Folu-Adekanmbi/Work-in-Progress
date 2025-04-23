@@ -116,9 +116,11 @@ void setDrivePower(float vx, float vy, float omega) { //given velotiy for x y an
 }
 
 
-float normalizeAngle(float angle) { //use normalize angle to get optimal pathing
-  while (angle > PI) angle -= 2 * PI;
-  while (angle < -PI) angle += 2 * PI;
+// Normalize angle to [-π, π]
+float normalizeAngle(float angle) {
+  angle = fmod(angle, 2*PI);
+  if (angle > PI) angle -= 2 * PI;
+  if (angle < -PI) angle += 2 * PI;
   return angle;
 }
 
