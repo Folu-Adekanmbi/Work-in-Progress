@@ -9,8 +9,8 @@ const int BR_IN1 = 7, BR_IN2 = 6, BR_EN = 5; //BR - back right
 // PD tuning constants
 const float kP_position = 1;
 const float kD_position = 0.1;
-const float kP_theta = 0.1;
-const float kD_theta = 0.25;
+const float kP_theta = 0;
+const float kD_theta = 0;
 int z = 0;
 
 const float positionTolerance = 0.05;
