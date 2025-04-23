@@ -15,7 +15,7 @@ int z = 0;
 
 const float positionTolerance = 0.05;
 const float thetaTolerance = 0.05;
-const unsigned long updateInterval = 20; // microseconds
+//const unsigned long updateInterval = 20; // microseconds
 
 //power should be given in range [-1, 1] which corresponds to max speed and minimum speed, 0 is stop
 void setMotorPower(int motor, float power) { //Input motor name either FL, FR, BL, BR and power calculated from set driver power
@@ -207,15 +207,10 @@ void setup() {
  Enes100.begin("Work in Progress", MATERIAL, 77, 1116, 15, 16);
   delay(200);
   Enes100.println("Successfully connected to the Vision System"); 
-  //pinMode(FL_IN1, OUTPUT); pinMode(FL_IN2, OUTPUT); pinMode(FL_EN, OUTPUT);
   pinMode(11, OUTPUT); pinMode(13, OUTPUT); pinMode(12, OUTPUT);
   pinMode(10, OUTPUT); pinMode(9, OUTPUT); pinMode(8, OUTPUT);
   pinMode(2, OUTPUT); pinMode(3, OUTPUT); pinMode(4, OUTPUT);
   pinMode(5, OUTPUT); pinMode(6, OUTPUT); pinMode(7, OUTPUT);
-
-
-  //pinMode(BL_IN1, OUTPUT); pinMode(BL_IN2, OUTPUT); pinMode(BL_EN, OUTPUT);
-  //pinMode(BR_IN1, OUTPUT); pinMode(BR_IN2, OUTPUT); pinMode(BR_EN, OUTPUT);
   Serial.begin(9600);
   Serial.println("succesful begin");
 }
