@@ -35,6 +35,24 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
     return (int)control;
 }
 
+void motorCW (int m1, int m2, int p) {
+  digitalWrite(m1, HIGH);
+  digitalWrite(m2, LOW);
+  analogWrite(S, p);
+}
+
+void motorCCW (int m1, int m2, int p) {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, HIGH);
+  analogWrite(S, p);
+}
+
+void motorStop (int m1, int m2) {
+  digitalWrite(m1, LOW);
+  digitalWrite(m2, LOW);
+  digitalWrite(S, LOW);
+}
+
 // Angle correction to a set angle
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
