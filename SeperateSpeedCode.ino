@@ -1,28 +1,29 @@
 #include "Enes100.h"
 
 //pinouts update as needed
-const int FL_IN1 = 2, FL_IN2 = 3, FL_EN = 9; //FL - front left
-const int FR_IN1 = 4, FR_IN2 = 5, FR_EN = 10; //FR - front right
-const int BL_IN1 = 6, BL_IN2 = 7, BL_EN = 11;  //BL - back left
-const int BR_IN1 = 8, BR_IN2 = 12, BR_EN = 13; //BR - back right
+const int FL_IN1 = 13, FL_IN2 = 12, FL_EN = 11; //FL - front left
+const int FR_IN1 = 4, FR_IN2 = 2, FR_EN = 3; //FR - front right
+const int BL_IN1 = 9, BL_IN2 = 8, BL_EN = 10;  //BL - back left
+const int BR_IN1 = 6, BR_IN2 = 7, BR_EN = 5; //BR - back right
 
 // PD tuning constants
-const float kP_position = 1.0;
-const float kD_position = 0.2;
-const float kP_theta = 1.0;
-const float kD_theta = 0.2;
+const float kP_position = 10;
+const float kD_position = 0.0;
+const float kP_theta = 0;
+const float kD_theta = 0.0;
+int z = 0;
 
 const float positionTolerance = 0.05;
 const float thetaTolerance = 0.05;
 const unsigned long updateInterval = 20; // ms
 
 //power should be given in range [-1, 1] which corresponds to max speed and minimum speed, 0 is stop
-void setMotorPower(String motor, float power) { //Input motor name either FL, FR, BL, BR and power calculated from set driver power
+void setMotorPower(int motor, float power) { //Input motor name either FL, FR, BL, BR and power calculated from set driver power
   // Constrain the power to be between -1 and 1
   power = constrain(power, -1.0, 1.0);
   int pwm = (int)(fabs(power) * 255);  // Scale to PWM range
 
-  if (motor == "FL") {
+  if (motor == 0) { //FL
     // Front Left motor
     if (power > 0) {
       digitalWrite(FL_IN1, HIGH);
@@ -36,7 +37,7 @@ void setMotorPower(String motor, float power) { //Input motor name either FL, FR
     }
     analogWrite(FL_EN, pwm);
 
-  } else if (motor == "FR") {
+  } else if (motor == 1) { //FR
     // Front Right motor
     if (power > 0) {
       digitalWrite(FR_IN1, HIGH);
@@ -50,7 +51,7 @@ void setMotorPower(String motor, float power) { //Input motor name either FL, FR
     }
     analogWrite(FR_EN, pwm);
 
-  } else if (motor == "BL") {
+  } else if (motor == 2) { //BL
     // Back Left motor
     if (power > 0) {
       digitalWrite(BL_IN1, HIGH);
@@ -64,7 +65,7 @@ void setMotorPower(String motor, float power) { //Input motor name either FL, FR
     }
     analogWrite(BL_EN, pwm);
 
-  } else if (motor == "BR") {
+  } else if (motor == 3) { //BR
     // Back Right motor
     if (power > 0) {
       digitalWrite(BR_IN1, HIGH);
@@ -87,10 +88,14 @@ void setDrivePower(float vx, float vy, float omega) { //given velotiy for x y an
   float backRight  = vx + vy - omega;
 
   // Normalize speeds but keep them proportional
-  float maxMagnitude = max(
-    1.0,
-    max(fabs(frontLeft), max(fabs(frontRight), max(fabs(backLeft), fabs(backRight))))
-  );
+  float maxMagnitude = max( 1.0, max(fabs(frontLeft), max(fabs(frontRight), max(fabs(backLeft), fabs(backRight)))));
+
+  Serial.println(frontLeft);
+  Serial.println(frontRight);
+  Serial.println(backLeft);
+  Serial.println(backRight);
+
+
 
   // Normalize to keep values within [-1, 1]
   frontLeft  /= maxMagnitude;
@@ -98,11 +103,16 @@ void setDrivePower(float vx, float vy, float omega) { //given velotiy for x y an
   backLeft   /= maxMagnitude;
   backRight  /= maxMagnitude;
 
+  Serial.println(frontLeft);
+  Serial.println(frontRight);
+  Serial.println(backLeft);
+  Serial.println(backRight);
+
   // Send powers to motors (replace with your motor commands)
-  setMotorPower("FL", frontLeft);
-  setMotorPower("FR", frontRight);
-  setMotorPower("BL", backLeft);
-  setMotorPower("BR", backRight);
+  setMotorPower(0, frontLeft);
+  setMotorPower(1, frontRight);
+  setMotorPower(2, backLeft);
+  setMotorPower(3, backRight);
 }
 
 
@@ -159,7 +169,8 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
     float cosTheta = cos(-theta);
     float sinTheta = sin(-theta);
     float vxRobot = vxField * cosTheta - vyField * sinTheta;
-    float vyRobot = vxField * sinTheta + vyField * cosTheta;
+    float vyRobot = -(vxField * sinTheta + vyField * cosTheta);
+
 
     // Angular velocity
     float omega = kP_theta * errorTheta + kD_theta * dErrorTheta;
@@ -168,6 +179,22 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
     vxRobot = constrain(vxRobot, -1.0, 1.0);
     vyRobot = constrain(vyRobot, -1.0, 1.0);
     omega = constrain(omega, -1.0, 1.0);
+    if(z == 100){
+    Enes100.print("vx: ");
+    Enes100.println(vxRobot);
+    Enes100.print("vy: ");
+
+    Enes100.println(vyRobot);
+    Enes100.print("omega: ");
+
+    Enes100.println(omega);
+    z = 0;
+    }
+    else{
+      z++;
+    }
+
+
 
     // Send power to drive system
     setDrivePower(vxRobot, vyRobot, omega);
@@ -179,16 +206,53 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
   }
 }
 void setup() {
-  Enes100.begin("Work in Progress", MATERIAL, 15, 1116, 52, 50);
+ Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 15, 16);
   delay(200);
-  Enes100.println("Successfully connected to the Vision System");
-  pinMode(FL_IN1, OUTPUT); pinMode(FL_IN2, OUTPUT); pinMode(FL_EN, OUTPUT);
-  pinMode(FR_IN1, OUTPUT); pinMode(FR_IN2, OUTPUT); pinMode(FR_EN, OUTPUT);
-  pinMode(BL_IN1, OUTPUT); pinMode(BL_IN2, OUTPUT); pinMode(BL_EN, OUTPUT);
-  pinMode(BR_IN1, OUTPUT); pinMode(BR_IN2, OUTPUT); pinMode(BR_EN, OUTPUT);
+  Enes100.println("Successfully connected to the Vision System"); 
+  //pinMode(FL_IN1, OUTPUT); pinMode(FL_IN2, OUTPUT); pinMode(FL_EN, OUTPUT);
+  pinMode(11, OUTPUT); pinMode(13, OUTPUT); pinMode(12, OUTPUT);
+  pinMode(10, OUTPUT); pinMode(9, OUTPUT); pinMode(8, OUTPUT);
+    pinMode(2, OUTPUT); pinMode(3, OUTPUT); pinMode(4, OUTPUT);
+        pinMode(5, OUTPUT); pinMode(6, OUTPUT); pinMode(7, OUTPUT);
+
+
+  //pinMode(BL_IN1, OUTPUT); pinMode(BL_IN2, OUTPUT); pinMode(BL_EN, OUTPUT);
+  //pinMode(BR_IN1, OUTPUT); pinMode(BR_IN2, OUTPUT); pinMode(BR_EN, OUTPUT);
+  Serial.begin(9600);
+  Serial.println("succesful begin");
 }
 
 void loop() {
+  //delay(3000);
+ //setMotorPower(0, -1);
+ // setMotorPower(1, 1);
+ //setDrivePower(1,-1,0);d
+  //  driveTo(3,1,0);
+ /* digitalWrite(FL_IN1, LOW);
+  digitalWrite(FL_IN2, HIGH);
+  analogWrite(FL_EN, 255);
+*/
+
+  analogWrite(10, 255);
+  digitalWrite(13, HIGH);
+  digitalWrite(12,LOW);
+
+  analogWrite(11,255);
+  digitalWrite(9,HIGH);
+  digitalWrite(8,LOW);
+
+  analogWrite(3,255);
+  digitalWrite(2,LOW);
+  digitalWrite(4,HIGH);
+
+  analogWrite(5,255);
+  digitalWrite(6,LOW);
+  digitalWrite(7,HIGH);
+
+delay(3000000000000000000);
+
+//  delay(100000000000);
+
 
 }
   
