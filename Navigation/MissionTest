@@ -14,19 +14,37 @@ const int foamThreshold = 650; // Lower value for foam due to weaker vibrations,
 // void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
 // correctOrientation(float tf
 
-void motorCW(){
-  setMotorPower(0, 1);
-  setMotorPower(2, 1);
-  setMotorPower(1, -1);
-  setMotorPower(3, -1);
+
+
+
+
+//rotate function with CW and CCW movement
+void rotate(int p) {
+  float power = constrain(p / 255.0f, -1.0, 1.0);  // Scale to range -1.0 to 1.0
+  if (p < 0) {
+    motorCW(abs(power));  // CW uses positive speed
+  } else {
+    motorCCW(abs(power)); // CCW uses positive speed
+  }
 }
 
-void motorCCW(){
-  setMotorPower(0, -1);
-  setMotorPower(2, -1);
-  setMotorPower(1, 1);
-  setMotorPower(3, 1);
+void motorCW(float p){
+  setMotorPower(0, p);  // FL
+  setMotorPower(2, p);  // BL
+  setMotorPower(1, -p); // FR
+  setMotorPower(3, -p); // BR
 }
+
+void motorCCW(float p){
+  setMotorPower(0, -p);  // FL
+  setMotorPower(2, -p);  // BL
+  setMotorPower(1, p);   // FR
+  setMotorPower(3, p);   // BR
+}
+
+
+
+
 
 // weight function
 void weight() {
