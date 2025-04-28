@@ -12,7 +12,21 @@ const int plasticThreshold = 850; // Higher value for plastic due to stronger vi
 const int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
 
 // void incrementalDrive (bool x, float coordF, bool strafe, float angle, float increment)
-// correctOrientation(float tf)
+// correctOrientation(float tf
+
+void motorCW(){
+  setMotorPower(0, 1);
+  setMotorPower(2, 1);
+  setMotorPower(1, -1);
+  setMotorPower(3, -1);
+}
+
+void motorCCW(){
+  setMotorPower(0, -1);
+  setMotorPower(2, -1);
+  setMotorPower(1, 1);
+  setMotorPower(3, 1);
+}
 
 // weight function
 void weight() {
