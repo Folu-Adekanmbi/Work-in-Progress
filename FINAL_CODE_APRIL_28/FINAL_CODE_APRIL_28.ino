@@ -8,6 +8,7 @@ const int BL_IN1 = 9, BL_IN2 = 8, BL_EN = 10;  //BL - back left
 const int BR_IN1 = 7, BR_IN2 = 6, BR_EN = 5; //BR - back right
 const int piezoPin = A5; // Piezo Pin allocation
 
+
 //scale setup
 const int LOADCELL_DOUT_PIN = 17;
 const int LOADCELL_SCK_PIN = 18;
@@ -250,6 +251,92 @@ const int foamThreshold = 650; // Lower value for foam due to weaker vibrations,
   }
 }
 
+
+
+// Controls angular movement
+int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
+    float kp = 70;
+    float kd = 50;
+    float error = normalizeAngle(setpoint - pv);
+    float derivative = 0;
+    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
+    float control = kp * error + kd * derivative;
+    control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; 
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40;
+    }
+    return (int)control;
+}
+
+//rotate function with CW and CCW movement
+void rotateOTV (int p) {
+  float power = constrain(p / 255.0f, -1.0, 1.0);  // Scale to range -1.0 to 1.0
+  if (p < 0) {
+    motorCW(abs(power));  // CW uses positive speed
+  } else {
+    motorCCW(abs(power)); // CCW uses positive speed
+  }
+}
+
+void motorCW(float p){
+  setMotorPower(0, p);  // FL
+  setMotorPower(2, p);  // BL
+  setMotorPower(1, -p); // FR
+  setMotorPower(3, -p); // BR
+}
+
+void motorCCW(float p){
+  setMotorPower(0, -p);  // FL
+  setMotorPower(2, -p);  // BL
+  setMotorPower(1, p);   // FR
+  setMotorPower(3, p);   // BR
+}
+
+// Rotate OTV FUNCTION CODE
+
+// void rotateOTV (int p) {
+//   if (p < 0) {
+//     p = abs(p);
+//     motorCW(FRD1, FRD2, p);
+//     motorCW(FLD1, FLD2, p);
+//     motorCW(BRD1, BRD2, p);
+//     motorCW(BLD1, BLD2, p);
+//   } else {
+//     p = abs(p);
+//     motorCCW(FRD1, FRD2, p);
+//     motorCCW(FLD1, FLD2, p);
+//     motorCCW(BRD1, BRD2, p);
+//     motorCCW(BLD1, BLD2, p);
+//   }
+
+// }
+
+
+// Angle correction to a set angle
+void correctOrientation(float tf) {
+  tf = normalizeAngle(tf);
+  float ti = Enes100.getTheta();
+  float dt = normalizeAngle(tf - ti);
+  long startTime = micros();
+  long diffTime = 0;
+  float P = 0;
+  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
+    diffTime = micros() - startTime;
+    ti = Enes100.getTheta();
+    P = pd_angular_controller(tf, ti, dt, diffTime);
+    dt = normalizeAngle(tf - ti);
+    startTime = micros();
+   // Enes100.println(dt);
+    //Enes100.println(P);
+    rotateOTV(P);
+  }
+  Enes100.println("I'm done rotating!!!!!! :DDDDDDDDDDDDDDD");
+  setDrivePower(0,0,0); //stopotv();
+}
+
 void setup() {
  Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 15, 16);
   delay(200);
@@ -268,27 +355,71 @@ void setup() {
 }
 
 // Total Navigation 
-void loop() {
-  //delay(3000);
- //setMotorPower(0, -1);
- // setMotorPower(1, 1);
- //setDrivePower(1,-1,0);d
-   driveTo(2.89,1.53,-PI/2);
- /* digitalWrite(FL_IN1, LOW);
-  digitalWrite(FL_IN2, HIGH);
-  analogWrite(FL_EN, 255);
-*/
-Enes100.println("I'm Done ");
+void mission() {
+// declaring Getting current position in mission function.
+    float x = Enes100.getX();
+    float y = Enes100.getY();
+    float theta = Enes100.getTheta(); // in radians
+//Start orientation and movement towards payload
+if (y < 1) {
+    correctOrientation(1.55); // might need to correct angle based on vision system numbers
+    driveTo(0.35, 2, 1.55);
+  } 
+  else {
+    correctOrientation(-1.55); // might need to correct angle
+     driveTo(0.35,0,-1.55);
+  }
+
+delay (1000); // delaying by a second before fufilling mission objectives 
+
+// Fulfill mission Stuff 
+
+// Testing weight 
+// Code to define weight
+float weight = 0;
+float reading = 0;
+for(int i = 0; i < 4; i++){
+reading = scale.get_units(1);
+weight+=reading;
 delay(500);
-   driveTo(3.92,1.53,-PI/2);
+}
+chooseMaterial(weight);
 
+delay(100); // Short delay to ensure multiple readings
 
+// run material identification using piezo
 
+piezo();
 
-delay(3000000000000000000);
+delay(100); // Short delay to ensure multiple readings
 
-//  delay(100000000000);
+//Code to drive otv back to the limbo after mission indentification
 
+if (y < 1) {
+    correctOrientation(1.55); // to return the otv to the edge of the arena
+    driveTo(0.35, 2, 1.55);
+    driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
+}
+else {
+  //no need to correct orientation already at the edge of arena
+    driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
+}
+// Aligning to the front of the limbo
+
+ // moving under Limbo
+driveTo(2.8,1.63,1.55); // fropm edge to the front of the middle of the limbo
+driveTo(3.96,1.63,1.55); // to the goal zone. 
 
 }
+
+void loop() {
+
+mission();
+delay(3000000000000000000);
+
+}
+
+
+
+
   
