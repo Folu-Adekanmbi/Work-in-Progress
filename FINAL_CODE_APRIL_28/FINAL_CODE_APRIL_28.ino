@@ -367,6 +367,7 @@ if (y < 1) {
     driveTo(0.35, 1.34, 1.55); // stops in front of payload
     delay(100);
     driveTo(0.35, 1.85, 1.55);// alligning payload to intake
+    delay(100);
     setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
   } 
@@ -375,6 +376,7 @@ if (y < 1) {
      driveTo(0.35,0.68,-1.55);// stops in front of payload
      delay(100);
      driveTo(0.35, 0.13,-1.55);// alligning payload to intake
+     delay(100);
      setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
   }
@@ -407,6 +409,7 @@ delay(100); // Short delay to ensure multiple readings
 
 if (y < 1) {
     driveTo(0.35,0.68,-1.55);// moving away from wall to allow correct orientation
+    delay(100);
     correctOrientation(1.55); // turning the front of the OTV 
     driveTo(0.35, 2, 1.55); // to return the otv to the other edge of the arena
     delay(100); //short delay before it begins strafing 
@@ -414,6 +417,7 @@ if (y < 1) {
 }
 else {
   driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
+  delay(100);
   //no need to correct orientation already at the edge of arena
     driveTo(2.8,2,1.55); //strafe forward before going into limbo
 }
