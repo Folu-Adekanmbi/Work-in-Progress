@@ -414,7 +414,7 @@ driveTo(3.96,1.63,1.55); // to the goal zone.
 
 void loop() {
 
-mission();
+/*mission();*/
 delay(3000000000000000000);
 
 }
