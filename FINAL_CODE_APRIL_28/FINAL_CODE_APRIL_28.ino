@@ -354,6 +354,7 @@ void setup() {
   Serial.println("succesful begin");
 }
 
+
 // Total Navigation 
 void mission() {
 // declaring Getting current position in mission function.
@@ -363,18 +364,27 @@ void mission() {
 //Start orientation and movement towards payload
 if (y < 1) {
     correctOrientation(1.55); // might need to correct angle based on vision system numbers
-    driveTo(0.35, 2, 1.55);
+    driveTo(0.35, 1.34, 1.55); // stops in front of payload
+    delay(100);
+    driveTo(0.35, 1.85, 1.55);// alligning payload to intake
+    setDrivePower(1,0,0);//moving at full speed into payload
+    delay(1500); //moves at top speed for 1.5 seconds into the wall
   } 
   else {
     correctOrientation(-1.55); // might need to correct angle
-     driveTo(0.35,0,-1.55);
+     driveTo(0.35,0.68,-1.55);// stops in front of payload
+     delay(100);
+     driveTo(0.35, 0.13,-1.55);// alligning payload to intake
+     setDrivePower(1,0,0);//moving at full speed into payload
+    delay(1500); //moves at top speed for 1.5 seconds into the wall
   }
 
-delay (1000); // delaying by a second before fufilling mission objectives 
+delay (100); // delaying by a 0.1 second before fufilling mission objectives 
 
-// Fulfill mission Stuff 
+// Fulfill mission objectives 
 
 // Testing weight 
+
 // Code to define weight
 float weight = 0;
 float reading = 0;
@@ -396,25 +406,30 @@ delay(100); // Short delay to ensure multiple readings
 //Code to drive otv back to the limbo after mission indentification
 
 if (y < 1) {
-    correctOrientation(1.55); // to return the otv to the edge of the arena
-    driveTo(0.35, 2, 1.55);
+    driveTo(0.35,0.68,-1.55);// moving away from wall to allow correct orientation
+    correctOrientation(1.55); // turning the front of the OTV 
+    driveTo(0.35, 2, 1.55); // to return the otv to the other edge of the arena
+    delay(100); //short delay before it begins strafing 
     driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
 }
 else {
+  driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
   //no need to correct orientation already at the edge of arena
-    driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
+    driveTo(2.8,2,1.55); //strafe forward before going into limbo
 }
 // Aligning to the front of the limbo
 
  // moving under Limbo
+ delay(100); // short delay before shifting to the front of the OTV
 driveTo(2.8,1.63,1.55); // fropm edge to the front of the middle of the limbo
+delay(100); // short delay before getting to goal zone
 driveTo(3.96,1.63,1.55); // to the goal zone. 
 
 }
 
 void loop() {
 
-/*mission();*/
+mission();
 delay(3000000000000000000);
 
 }
