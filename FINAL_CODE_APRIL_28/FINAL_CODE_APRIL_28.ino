@@ -215,7 +215,7 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
 }
 
 void chooseMaterial(float reading){
-  if(reading>232){
+  if(reading>220){
     Enes100.mission(WEIGHT, HEAVY);
     Serial.println("heavy");
   }
@@ -388,22 +388,16 @@ if (y < 1) {
      setDrivePower(0,0,0); // stop otv
   }
 
-delay (100); // delaying by a 0.1 second before fufilling mission objectives 
+delay (1000); // delaying by a 1 second before fufilling mission objectives 
 
 // Fulfill mission objectives 
 
 // Testing weight 
 
 // Code to define weight
-float weight = 0;
-float reading = 0;
-for(int i = 0; i < 4; i++){
-reading = scale.get_units(1);
-weight+=reading;
-delay(500);
-}
-chooseMaterial(weight);
-
+chooseMaterial(scale.get_units(10));
+Enes100.println(scale.get_units(10));
+  
 delay(100); // Short delay to ensure multiple readings
 
 // run material identification using piezo
@@ -439,10 +433,8 @@ driveTo(3.96,1.63,1.55); // to the goal zone.
 }
 
 void loop() {
-
 mission();
 delay(3000000000000000000);
-
 }
 
 
