@@ -352,6 +352,11 @@ void setup() {
   //pinMode(BR_IN1, OUTPUT); pinMode(BR_IN2, OUTPUT); pinMode(BR_EN, OUTPUT);
   Serial.begin(9600);
   Serial.println("succesful begin");
+  
+  // SCALE setup
+  scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
+  scale.set_scale(-770.36);
+  scale.tare();   
 }
 
 
