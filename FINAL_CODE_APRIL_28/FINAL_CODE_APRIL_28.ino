@@ -375,6 +375,7 @@ if (y < 1) {
     delay(100);
     setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
+   setDrivePower(0,0,0); // stop otv
   } 
   else {
     correctOrientation(-1.55); // might need to correct angle
@@ -384,6 +385,7 @@ if (y < 1) {
      delay(100);
      setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
+     setDrivePower(0,0,0); // stop otv
   }
 
 delay (100); // delaying by a 0.1 second before fufilling mission objectives 
