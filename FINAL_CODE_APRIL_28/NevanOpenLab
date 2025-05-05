@@ -191,8 +191,8 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
     // Convert to robot frame
     float cosTheta = cos(-theta);
     float sinTheta = sin(-theta);
-    float vxRobot = vxField * cosTheta + vyField * sinTheta;
-    float vyRobot = -vxField * sinTheta + vyField * cosTheta;
+    float vxRobot = vxField * cosTheta - vyField * sinTheta;
+    float vyRobot = -(vxField * sinTheta + vyField * cosTheta);
 
 
     // Angular velocity
