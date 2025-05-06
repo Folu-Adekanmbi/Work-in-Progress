@@ -3,9 +3,9 @@
 
 //pinouts update as needed
 const int FL_IN1 = 12, FL_IN2 = 13, FL_EN = 11; //FL - front left
-const int FR_IN1 = 2, FR_IN2 = 4, FR_EN = 3; //FR - front right
+const int FR_IN1 = 7, FR_IN2 = 6, FR_EN = 9; //FR - front right
 const int BL_IN1 = 8, BL_IN2 = 5, BL_EN = 10;  //BL - back left
-const int BR_IN1 = 7, BR_IN2 = 6, BR_EN = 9; //BR - back right
+const int BR_IN1 = 2, BR_IN2 = 4, BR_EN = 3; //BR - back right
 const int piezoPin = A5; // Piezo Pin allocation
 
 //5 sucks
@@ -23,57 +23,17 @@ const float kD_theta = 0;
 int z = 0;
 
 const float positionTolerance = 0.05;
-const float thetaTolerance = 0.02;
-const unsigned long updateInterval = 20; // micros
+const float thetaTolerance = 0.05;
+const unsigned long updateInterval = 20; // ms
 
 //power should be given in range [-1, 1] which corresponds to max speed and minimum speed, 0 is stop
-//Power Values that stop each motor
-/*FR: 0.13
-FL: 0.15
-BL: 0.13
-BR: 0.2*/
 void setMotorPower(int motor, float power) { //Input motor name either FL, FR, BL, BR and power calculated from set driver power
+  // Constrain the power to be between -1 and 1
+  power = constrain(power, -1.0, 1.0);
+  int pwm = (int)(fabs(power) * 255);  // Scale to PWM range
 
   if (motor == 0) { //FL
     // Front Left motor
-    float pow = constrain(fabs(power), 0.15, 0.8);
-    power = constrain(power, -1.0, 1.0);
-    int pwm = (int)(fabs(pow) * 255);  // Scale to PWM range
-    if (power > 0) {
-      digitalWrite(BL_IN1, HIGH);
-      digitalWrite(BL_IN2, LOW);
-    } else if (power < 0) {
-      digitalWrite(BL_IN1, LOW);
-      digitalWrite(BL_IN2, HIGH);
-    } else {
-      digitalWrite(BL_IN1, LOW);
-      digitalWrite(BL_IN2, HIGH);
-      pwm = 1;
-    }
-    analogWrite(BL_EN, pwm);
-
-  } else if (motor == 1) { //FR
-    // Front Right motor
-    float pow = constrain(fabs(power), 0.13, 1.0);
-    power = constrain(power, -1.0, 1.0);
-    int pwm = (int)(fabs(pow) * 255);  // Scale to PWM range
-    if (power > 0) {
-      digitalWrite(FR_IN1, HIGH);
-      digitalWrite(FR_IN2, LOW);
-    } else if (power < 0) {
-      digitalWrite(FR_IN1, LOW);
-      digitalWrite(FR_IN2, HIGH);
-    } else {
-      digitalWrite(FR_IN1, LOW);
-      digitalWrite(FR_IN2, LOW);
-    }
-    analogWrite(FR_EN, pwm);
-
-  } else if (motor == 2) { //BL
-    // Back Left motor
-    float pow = constrain(fabs(power), 0.13, 0.8);
-    power = constrain(power, -1.0, 1.0);
-    int pwm = (int)(fabs(pow) * 255);  // Scale to PWM range
     if (power > 0) {
       digitalWrite(FL_IN1, HIGH);
       digitalWrite(FL_IN2, LOW);
@@ -82,16 +42,41 @@ void setMotorPower(int motor, float power) { //Input motor name either FL, FR, B
       digitalWrite(FL_IN2, HIGH);
     } else {
       digitalWrite(FL_IN1, LOW);
-      digitalWrite(FL_IN2, HIGH);
-      pwm = 1;
+      digitalWrite(FL_IN2, LOW);
     }
     analogWrite(FL_EN, pwm);
 
+  } else if (motor == 1) { //FR
+    // Front Right motor
+    if (power > 0) {
+      digitalWrite(FR_IN1, HIGH);
+      digitalWrite(FR_IN2, LOW);
+    } else if (power < 0) {
+      digitalWrite(FR_IN1, LOW);
+      digitalWrite(FR_IN2, HIGH);
+    } else {
+      digitalWrite(FR_IN1, HIGH);
+      digitalWrite(FR_IN2, LOW);
+      pwm = 1;
+    }
+    analogWrite(FR_EN, pwm);
+
+  } else if (motor == 2) { //BL
+    // Back Left motor
+    if (power > 0) {
+      digitalWrite(BL_IN1, HIGH);
+      digitalWrite(BL_IN2, LOW);
+    } else if (power < 0) {
+      digitalWrite(BL_IN1, LOW);
+      digitalWrite(BL_IN2, HIGH);
+    } else {
+      digitalWrite(BL_IN1, LOW);
+      digitalWrite(BL_IN2, LOW);
+    }
+    analogWrite(BL_EN, pwm);
+
   } else if (motor == 3) { //BR
     // Back Right motor
-    float pow = constrain(fabs(power), 0.2, 1.0);
-    power = constrain(power, -1.0, 1.0);
-    int pwm = (int)(fabs(pow) * 255);  // Scale to PWM range
     if (power > 0) {
       digitalWrite(BR_IN1, HIGH);
       digitalWrite(BR_IN2, LOW);
@@ -99,8 +84,9 @@ void setMotorPower(int motor, float power) { //Input motor name either FL, FR, B
       digitalWrite(BR_IN1, LOW);
       digitalWrite(BR_IN2, HIGH);
     } else {
-      digitalWrite(BR_IN1, LOW);
+      digitalWrite(BR_IN1, HIGH);
       digitalWrite(BR_IN2, LOW);
+      pwm = 1;
     }
     analogWrite(BR_EN, pwm);
   }
@@ -119,7 +105,7 @@ void setDrivePower(float vx, float vy, float omega) { //given velotiy for x y an
   Serial.println(frontRight);
   Serial.println(backLeft);
   Serial.println(backRight);
-  
+
 
 
   // Normalize to keep values within [-1, 1]
@@ -132,7 +118,6 @@ void setDrivePower(float vx, float vy, float omega) { //given velotiy for x y an
   Serial.println(frontRight);
   Serial.println(backLeft);
   Serial.println(backRight);
-  
 
   // Send powers to motors (replace with your motor commands)
   setMotorPower(0, frontLeft);
@@ -153,14 +138,16 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
   float prevErrorY = 0;
   float prevErrorTheta = 0;
 
-  long startTime = micros();
+  unsigned long lastUpdate = millis();
+
   while (true) {
-    /*if (now - lastUpdate < updateInterval) {
+    unsigned long now = millis();
+    if (now - lastUpdate < updateInterval) {
       continue; // Don't update yet, but keep looping
-    }*/
-    long currentTime = micros();
-    long dt = currentTime - startTime; // convert to seconds
-    startTime = currentTime;
+    }
+
+    float dt = (now - lastUpdate) / 1000.0; // convert to seconds
+    lastUpdate = now;
 
     // Get current position
     float x = Enes100.getX();
@@ -174,16 +161,16 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
 
     // Check if we're within tolerance
     if (fabs(errorX) < positionTolerance &&
-        fabs(errorY) < positionTolerance){
-        //fabs(errorTheta) < thetaTolerance
+        fabs(errorY) < positionTolerance /*&&
+        fabs(errorTheta) < thetaTolerance)*/ ){
       setDrivePower(0, 0, 0);
       break;
     }
 
     // Derivatives
-    float dErrorX = (errorX - prevErrorX) / (((float)dt) / 1000000);
-    float dErrorY = (errorY - prevErrorY) /  (((float)dt) / 1000000);
-    float dErrorTheta = (normalizeAngle(errorTheta - prevErrorTheta)) /  (((float)dt) / 1000000);
+    float dErrorX = (errorX - prevErrorX) / dt;
+    float dErrorY = (errorY - prevErrorY) / dt;
+    float dErrorTheta = (errorTheta - prevErrorTheta) / dt;
 
     // PD control in field space
     float vxField = kP_position * errorX + kD_position * dErrorX;
@@ -207,6 +194,7 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
     Enes100.print("vx: ");
     Enes100.println(vxRobot);
     Enes100.print("vy: ");
+
     Enes100.println(vyRobot);
     Enes100.print("omega: ");
 
@@ -218,28 +206,30 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
     }
 
 
+
+    // Send power to drive system
+    setDrivePower(vxRobot, vyRobot, omega);
+
     //save values for next loop
     prevErrorX = errorX;
     prevErrorY = errorY;
-    prevErrorTheta = errorTheta;
-    // Send power to drive system
-    setDrivePower(vxRobot, vyRobot, omega);
+    prevErrorTheta = normalizeAngle(errorTheta);
   }
 }
 
 void chooseMaterial(float reading){
   if(reading>220){
     Enes100.mission(WEIGHT, HEAVY);
-    Serial.println("heavy");
+    Enes100.println("heavy");
   }
   else if(reading>140){
     Enes100.mission(WEIGHT, MEDIUM);
-        Serial.println("medium");
+    Enes100.println("medium");
 
   }
   else{
     Enes100.mission(WEIGHT, LIGHT);
-    Serial.println("light");
+    Enes100.println("light");
 
   }
 }
@@ -275,18 +265,24 @@ int pd_angular_controller(float setpoint, float pv, float previous_error, long d
     if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
     float control = kp * error + kd * derivative;
     control = constrain(control, -255, 255);
+    if (control < 0) {
+      if (fabs(control) <= 40) control = -40; 
+    }
+    if (control > 0) {
+      if (fabs(control) <= 40) control = 40;
+    }
     return (int)control;
 }
 
 //rotate function with CW and CCW movement
 void rotateOTV (int p) {
-  float power = constrain(p / 255.0f, -1.0, 1.0);  // Scale to range -1.0 to 1.0
+  float power = constrain((p / 255.0), -1.0, 1.0);  // Scale to range -1.0 to 1.0
   if (p < 0) {
     motorCW(abs(power));  // CW uses positive speed
   } else {
     motorCCW(abs(power)); // CCW uses positive speed
   }
-}
+} 
 
 void motorCW(float p){
   setMotorPower(0, p);  // FL
@@ -330,12 +326,12 @@ void correctOrientation(float tf) {
   long startTime = micros();
   long diffTime = 0;
   float P = 0;
-  while (fabs(normalizeAngle(tf-ti)) > 0.02) {
+  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
     diffTime = micros() - startTime;
-    startTime = micros();
     ti = Enes100.getTheta();
     P = pd_angular_controller(tf, ti, dt, diffTime);
     dt = normalizeAngle(tf - ti);
+    startTime = micros();
    // Enes100.println(dt);
     //Enes100.println(P);
     rotateOTV(P);
@@ -345,20 +341,20 @@ void correctOrientation(float tf) {
 }
 
 void setup() {
- Enes100.begin("Work in Progress", MATERIAL, 77, 1120, 15, 16);
+  Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 15, 16);
   delay(200);
   Enes100.println("Successfully connected to the Vision System"); 
   //pinMode(FL_IN1, OUTPUT); pinMode(FL_IN2, OUTPUT); pinMode(FL_EN, OUTPUT);
   pinMode(11, OUTPUT); pinMode(13, OUTPUT); pinMode(12, OUTPUT);
   pinMode(10, OUTPUT); pinMode(9, OUTPUT); pinMode(8, OUTPUT);
-    pinMode(2, OUTPUT); pinMode(3, OUTPUT); pinMode(4, OUTPUT);
-        pinMode(1, OUTPUT); pinMode(6, OUTPUT); pinMode(7, OUTPUT);
+  pinMode(2, OUTPUT); pinMode(3, OUTPUT); pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT); pinMode(6, OUTPUT); pinMode(7, OUTPUT);
 
 
   //pinMode(BL_IN1, OUTPUT); pinMode(BL_IN2, OUTPUT); pinMode(BL_EN, OUTPUT);
   //pinMode(BR_IN1, OUTPUT); pinMode(BR_IN2, OUTPUT); pinMode(BR_EN, OUTPUT);
   //Serial.begin(9600);
-  Serial.println("succesful begin");
+  //Serial.println("succesful begin");
   
   // SCALE setup
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
@@ -375,26 +371,25 @@ void mission() {
     float theta = Enes100.getTheta(); // in radians
 //Start orientation and movement towards payload
 if (y < 1) {
-    correctOrientation(1.55); // might need to correct angle based on vision system numbers
+    correctOrientation(1.57); // might need to correct angle based on vision system numbers
+    driveTo(0.35, 0.44, 1.57); // sets starting position
     delay(100);
-    driveTo(0.35, 0.44, 1.55); // sets starting position
+    driveTo(0.35, 1.34, 1.57); // stops in front of payload
     delay(100);
-    driveTo(0.35, 1.34, 1.55); // stops in front of payload
-    delay(100);
-    driveTo(0.35, 1.85, 1.55);// alligning payload to intake
+    driveTo(0.35, 1.85, 1.57);// alligning payload to intake
     delay(100);
     setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
    setDrivePower(0,0,0); // stop otv
   } 
   else {
-     correctOrientation(-1.55); // might need to correct angle
+    correctOrientation(-1.57); // might need to correct angle
+    delay(100);
+    driveTo(0.35, 1.59, -1.57); // sets starting position
+    delay(100);
+     driveTo(0.35,0.68,-1.57);// stops in front of payload
      delay(100);
-     driveTo(0.35, 1.59, -1.55); // sets starting position
-     delay(100);
-     driveTo(0.35,0.68,-1.55);// stops in front of payload
-     delay(100);
-     driveTo(0.35, 0.13,-1.55);// alligning payload to intake
+     driveTo(0.35, 0.13,-1.57);// alligning payload to intake
      delay(100);
      setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
@@ -422,18 +417,18 @@ delay(100); // Short delay to ensure multiple readings
 //Code to drive otv back to the limbo after mission indentification
 
 if (y < 1) {
-    driveTo(0.35,0.68,-1.55);// moving away from wall to allow correct orientation
+    driveTo(0.35,0.68,-1.57);// moving away from wall to allow correct orientation
     delay(100);
-    correctOrientation(1.55); // turning the front of the OTV 
-    driveTo(0.35, 2, 1.55); // to return the otv to the other edge of the arena
+    correctOrientation(1.57); // turning the front of the OTV 
+    driveTo(0.35, 2, 1.57); // to return the otv to the other edge of the arena
     delay(100); //short delay before it begins strafing 
-    driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
+    driveTo(2.8,2,1.57); //navigate forward before strafing into limbo
 }
 else {
-  driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
+  driveTo(0.35, 2, 1.57); // ensure it is at the very edge of the 
   delay(100);
   //no need to correct orientation already at the edge of arena
-    driveTo(2.8,2,1.55); //strafe forward before going into limbo
+    driveTo(2.8,2,1.57); //strafe forward before going into limbo
 }
 // Aligning to the front of the limbo
 
@@ -445,15 +440,13 @@ driveTo(3.96,1.63,1.55); // to the goal zone.
 
 }
 
-
 void loop() {
-    if(Enes100.isVisible()){
-    correctOrientation(1.55); // might need to correct angle based on vision system numbers
-    delay(100);
-    driveTo(0.35, 0.44, 0); // sets starting position
-    delay(100000000000);
-    }
-    //delay(100000000000);
+  if(Enes100.isVisible()){
+    correctOrientation(1.57); // might need to correct angle based on vision system numbers
+    delay(10000000);
+  }
+
+
 }
 
 
