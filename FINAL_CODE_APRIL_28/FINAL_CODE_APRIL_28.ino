@@ -218,11 +218,11 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
 void chooseMaterial(float reading){
   if(reading>220){
     Enes100.mission(WEIGHT, HEAVY);
-    Serial.println("WEIGHT: HEAVY");
+    Enes100.println("WEIGHT: HEAVY");
   }
   else if(reading>140){
     Enes100.mission(WEIGHT, MEDIUM);
-        Serial.println("WEIGHT: MEDIUM");
+    Enes100.println("WEIGHT: MEDIUM");
 
   }
   else{
@@ -237,11 +237,11 @@ void fsr() {
   int fValue = analogRead(fpin);
   if (fValue > foamThreshold) {
     Enes100.mission(MATERIAL_TYPE, FOAM);
-    Serial.println("MATERIAL: FOAM");
+    Enes100.println("MATERIAL: FOAM");
   }
   else {
     Enes100.mission(MATERIAL_TYPE, PLASTIC);
-    Serial.println("MATERIAL: PLASTIC");
+    Enes100.println("MATERIAL: PLASTIC");
   }
 }
 
