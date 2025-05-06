@@ -2,12 +2,13 @@
 #include "HX711.h"
 
 //pinouts update as needed
-const int FL_IN1 = 13, FL_IN2 = 12, FL_EN = 11; //FL - front left
+const int FL_IN1 = 12, FL_IN2 = 13, FL_EN = 11; //FL - front left
 const int FR_IN1 = 2, FR_IN2 = 4, FR_EN = 3; //FR - front right
-const int BL_IN1 = 9, BL_IN2 = 8, BL_EN = 10;  //BL - back left
-const int BR_IN1 = 1, BR_IN2 = 6, BR_EN = 5; //BR - back right
+const int BL_IN1 = 8, BL_IN2 = 5, BL_EN = 10;  //BL - back left
+const int BR_IN1 = 7, BR_IN2 = 6, BR_EN = 9; //BR - back right
 const int piezoPin = A5; // Piezo Pin allocation
 
+//5 sucks
 
 //scale setup
 const int LOADCELL_DOUT_PIN = 17;
@@ -338,20 +339,20 @@ void correctOrientation(float tf) {
 }
 
 void setup() {
- Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 15, 16);
+  Enes100.begin("Work in Progress", MATERIAL, 495, 1116, 15, 16);
   delay(200);
   Enes100.println("Successfully connected to the Vision System"); 
   //pinMode(FL_IN1, OUTPUT); pinMode(FL_IN2, OUTPUT); pinMode(FL_EN, OUTPUT);
   pinMode(11, OUTPUT); pinMode(13, OUTPUT); pinMode(12, OUTPUT);
   pinMode(10, OUTPUT); pinMode(9, OUTPUT); pinMode(8, OUTPUT);
-    pinMode(2, OUTPUT); pinMode(3, OUTPUT); pinMode(4, OUTPUT);
-        pinMode(5, OUTPUT); pinMode(6, OUTPUT); pinMode(7, OUTPUT);
+  pinMode(2, OUTPUT); pinMode(3, OUTPUT); pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT); pinMode(6, OUTPUT); pinMode(7, OUTPUT);
 
 
   //pinMode(BL_IN1, OUTPUT); pinMode(BL_IN2, OUTPUT); pinMode(BL_EN, OUTPUT);
   //pinMode(BR_IN1, OUTPUT); pinMode(BR_IN2, OUTPUT); pinMode(BR_EN, OUTPUT);
-  Serial.begin(9600);
-  Serial.println("succesful begin");
+  //Serial.begin(9600);
+  //Serial.println("succesful begin");
   
   // SCALE setup
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
@@ -433,8 +434,11 @@ driveTo(3.96,1.63,1.55); // to the goal zone.
 }
 
 void loop() {
-mission();
-delay(3000000000000000000);
+  if(Enes100.isVisible()){
+    mission();
+    delay(100000);
+  }
+
 }
 
 
