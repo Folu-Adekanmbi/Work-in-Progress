@@ -14,6 +14,7 @@ const int foamThreshold = 3;
 const int LOADCELL_DOUT_PIN = 17;
 const int LOADCELL_SCK_PIN = 18;
 HX711 scale;
+bool check = false;
 
 // PD tuning constants
 const float kP_position = 2;
@@ -219,16 +220,18 @@ void chooseMaterial(float reading){
   if(reading>220){
     Enes100.mission(WEIGHT, HEAVY);
     Enes100.println("WEIGHT: HEAVY");
+    check = true;
   }
   else if(reading>140){
     Enes100.mission(WEIGHT, MEDIUM);
     Enes100.println("WEIGHT: MEDIUM");
+    check = true;
 
   }
-  else{
+  else {
     Enes100.mission(WEIGHT, LIGHT);
     Serial.println("WEIGHT: LIGHT");
-
+    check = true;
   }
 }
 
@@ -379,27 +382,22 @@ if (y < 1) {
     delay(1500); //moves at top speed for 1.5 seconds into the wall
      setDrivePower(0,0,0); // stop otv
   }
-
 delay (1000); // delaying by a 1 second before fufilling mission objectives 
 
-// Fulfill mission objectives 
-
-// Testing weight 
+// Fulfill mission objectives  
 
 // Code to define weight
 chooseMaterial(scale.get_units(10));
-Enes100.println(scale.get_units(10));
-  
+/*Enes100.println(scale.get_units(10));*/
 delay(100); // Short delay to ensure multiple readings
 
-// run material identification using piezo
-
-piezo();
-
+// run material identification using fsr
+if (check == true) {
+   fsr();
+}
 delay(100); // Short delay to ensure multiple readings
 
 //Code to drive otv back to the limbo after mission indentification
-
 if (y < 1) {
     driveTo(0.35,0.68,-1.55);// moving away from wall to allow correct orientation
     delay(100);
