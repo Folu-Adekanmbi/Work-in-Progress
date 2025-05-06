@@ -6,9 +6,9 @@ const int FL_IN1 = 12, FL_IN2 = 13, FL_EN = 11; //FL - front left
 const int FR_IN1 = 2, FR_IN2 = 4, FR_EN = 3; //FR - front right
 const int BL_IN1 = 8, BL_IN2 = 5, BL_EN = 10;  //BL - back left
 const int BR_IN1 = 7, BR_IN2 = 6, BR_EN = 9; //BR - back right
-const int piezoPin = A5; // Piezo Pin allocation
 
-//5 sucks
+const int fpin = A5; // FSR pin A5
+const int foamThreshold = 3;
 
 //scale setup
 const int LOADCELL_DOUT_PIN = 17;
@@ -218,41 +218,32 @@ void driveTo(float xTarget, float yTarget, float thetaTarget) { //drives to give
 void chooseMaterial(float reading){
   if(reading>220){
     Enes100.mission(WEIGHT, HEAVY);
-    Serial.println("heavy");
+    Serial.println("WEIGHT: HEAVY");
   }
   else if(reading>140){
     Enes100.mission(WEIGHT, MEDIUM);
-        Serial.println("medium");
+        Serial.println("WEIGHT: MEDIUM");
 
   }
   else{
     Enes100.mission(WEIGHT, LIGHT);
-    Serial.println("light");
+    Serial.println("WEIGHT: LIGHT");
 
   }
 }
 
-// Piezo code
-// piezo const
-
-void piezo () {
-const int plasticThreshold = 850; // Higher value for plastic due to stronger vibrations 850 is placeholder
-const int foamThreshold = 650; // Lower value for foam due to weaker vibrations, 650 is placeholder
-// run material identification using piezo
-  int piezoValue = analogRead(piezoPin); // Piezo reads values from 512-1023
-  //Compares piezo reading to each threshold to determine material
-  if (piezoValue > plasticThreshold) {
-    Serial.println("PLASTIC");
-  } 
-  else if (piezoValue > foamThreshold) {
-    Serial.println("FOAM");
+// FSR code (run after weight is calculated)
+void fsr() {
+  int fValue = analogRead(fpin);
+  if (fValue > foamThreshold) {
+    Enes100.mission(MATERIAL_TYPE, FOAM);
+    Serial.println("MATERIAL: FOAM");
   }
   else {
-    Serial.println("NOTHING");
+    Enes100.mission(MATERIAL_TYPE, PLASTIC);
+    Serial.println("MATERIAL: PLASTIC");
   }
 }
-
-
 
 // Controls angular movement
 int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
