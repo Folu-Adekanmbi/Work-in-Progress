@@ -1,1 +1,12 @@
+const int fpin = A5; 
+const int foamThreshold = 3;
 
+void fsr() {
+  int fValue = analogRead(fpin);
+  if (fValue > foamThreshold) {
+    Enes100.print("FOAM");
+  }
+  else {
+    Enes100.print("PLASTIC");
+  }
+}
