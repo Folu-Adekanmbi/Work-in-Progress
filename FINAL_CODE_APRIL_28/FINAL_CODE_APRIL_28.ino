@@ -249,22 +249,36 @@ void fsr() {
 }
 
 // Controls angular movement
-int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
-    float kp = 70;
-    float kd = 50;
+int pid_angular_controller(float setpoint, float pv, float previous_error, long diffTime, float *integral) {
+    float kp = 119.5;
+    float ki = 0;
+    float kd = 49.5;  // Currently zero; increase if needed for damping
+
     float error = normalizeAngle(setpoint - pv);
     float derivative = 0;
-    if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
-    float control = kp * error + kd * derivative;
-    control = constrain(control, -255, 255);
-    if (control < 0) {
-      if (fabs(control) <= 40) control = -40; 
+
+    if (diffTime > 0) {
+        derivative = normalizeAngle(error - previous_error) / ((float)diffTime / 1000000.0f);
     }
-    if (control > 0) {
-      if (fabs(control) <= 40) control = 40;
+
+    // Reset integral if error changed sign (crossed setpoint)
+    if (error * previous_error < 0) {
+        *integral = 0;
     }
+
+    *integral += error * ((float)diffTime / 1000000.0f);  // Integrate over time
+    *integral = constrain(*integral, -500, 500);          // Anti-windup
+
+    float control = kp * error + ki * (*integral) + kd * derivative;
+    control = constrain(control, -255, 255);              // Clamp to output range
+
+    // Apply dead zone for motor response
+    if (control < 0 && fabs(control) <= 40) control = -40;
+    if (control > 0 && fabs(control) <= 40) control = 40;
+
     return (int)control;
 }
+
 
 //rotate function with CW and CCW movement
 void rotateOTV (int p) {
@@ -314,22 +328,41 @@ void motorCCW(float p){
 void correctOrientation(float tf) {
   tf = normalizeAngle(tf);
   float ti = Enes100.getTheta();
-  float dt = normalizeAngle(tf - ti);
+  float previous_error = normalizeAngle(tf - ti);
   long startTime = micros();
   long diffTime = 0;
-  float P = 0;
-  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
-    diffTime = micros() - startTime;
+  float controlSignal = 0;
+  float integral = 0;
+
+  // New variables for stability check
+  const float angleThreshold = 0.01;
+  const unsigned long stableDuration = 0; // 75 ms in microseconds
+  unsigned long stableStart = 0;
+
+  while (true) {
     ti = Enes100.getTheta();
-    P = pd_angular_controller(tf, ti, dt, diffTime);
-    dt = normalizeAngle(tf - ti);
+    float current_error = normalizeAngle(tf - ti);
+
+    if (fabs(current_error) < angleThreshold) {
+      if (stableStart == 0) {
+        stableStart = micros();  // Start timing stability
+      } else if (micros() - stableStart >= stableDuration) {
+        break;  // Exit only after stable for required duration
+      }
+    } else {
+      stableStart = 0; // Reset stability timer if error goes back up
+    }
+
+    diffTime = micros() - startTime;
+    controlSignal = pid_angular_controller(tf, ti, previous_error, diffTime, &integral);
+    rotateOTV(controlSignal);
+    
+    previous_error = current_error;
     startTime = micros();
-   // Enes100.println(dt);
-    //Enes100.println(P);
-    rotateOTV(P);
   }
+
   Enes100.println("I'm done rotating!!!!!! :DDDDDDDDDDDDDDD");
-  setDrivePower(0,0,0); //stopotv();
+  setDrivePower(0, 0, 0);
 }
 
 void setup() {
