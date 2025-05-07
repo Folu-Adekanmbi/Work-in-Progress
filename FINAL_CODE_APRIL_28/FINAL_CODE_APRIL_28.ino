@@ -396,20 +396,25 @@ void mission() {
     float theta = Enes100.getTheta(); // in radians
 //Start orientation and movement towards payload
 if (y < 1) {
-    correctOrientation(1.55); // might need to correct angle based on vision system numbers
-    driveTo(0.35, 1.34, 1.55); // stops in front of payload
+    correctOrientation(1.57); // might need to correct angle based on vision system numbers
+    driveTo(0.35, 0.44, 1.57); // sets starting position
     delay(100);
-    driveTo(0.35, 1.85, 1.55);// alligning payload to intake
+    driveTo(0.35, 1.34, 1.57); // stops in front of payload
+    delay(100);
+    driveTo(0.35, 1.85, 1.57);// alligning payload to intake
     delay(100);
     setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
    setDrivePower(0,0,0); // stop otv
   } 
   else {
-    correctOrientation(-1.55); // might need to correct angle
-     driveTo(0.35,0.68,-1.55);// stops in front of payload
+    correctOrientation(-1.57); // might need to correct angle
+    delay(100);
+    driveTo(0.35, 1.59, -1.57); // sets starting position
+    delay(100);
+     driveTo(0.35,0.68,-1.57);// stops in front of payload
      delay(100);
-     driveTo(0.35, 0.13,-1.55);// alligning payload to intake
+     driveTo(0.35, 0.13,-1.57);// alligning payload to intake
      delay(100);
      setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
