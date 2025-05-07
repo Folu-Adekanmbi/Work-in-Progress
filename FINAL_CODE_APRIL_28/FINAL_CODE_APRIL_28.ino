@@ -3,9 +3,9 @@
 
 //pinouts update as needed
 const int FL_IN1 = 12, FL_IN2 = 13, FL_EN = 11; //FL - front left
-const int FR_IN1 = 2, FR_IN2 = 4, FR_EN = 3; //FR - front right
+const int FR_IN1 = 7, FR_IN2 = 6, FR_EN = 9; //FR - front right
 const int BL_IN1 = 8, BL_IN2 = 5, BL_EN = 10;  //BL - back left
-const int BR_IN1 = 7, BR_IN2 = 6, BR_EN = 9; //BR - back right
+const int BR_IN1 = 2, BR_IN2 = 4, BR_EN = 3; //BR - back right
 
 const int fpin = A5; // FSR pin A5
 const int foamThreshold = 3;
