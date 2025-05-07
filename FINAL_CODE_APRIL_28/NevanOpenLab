@@ -258,8 +258,8 @@ const int foamThreshold = 650; // Lower value for foam due to weaker vibrations,
 
 // Controls angular movement
 int pd_angular_controller(float setpoint, float pv, float previous_error, long diffTime){
-    float kp = 70;
-    float kd = 50;
+    float kp = 200;
+    float kd = 0;
     float error = normalizeAngle(setpoint - pv);
     float derivative = 0;
     if (diffTime > 0) derivative = ((normalizeAngle(error - previous_error)) / (((float)diffTime) / 1000000));
@@ -326,7 +326,8 @@ void correctOrientation(float tf) {
   long startTime = micros();
   long diffTime = 0;
   float P = 0;
-  while (fabs(normalizeAngle(tf-ti)) > 0.05) {
+  while (fabs(normalizeAngle(tf-ti)) > 0.01) {
+    rotateOTV(P);
     diffTime = micros() - startTime;
     ti = Enes100.getTheta();
     P = pd_angular_controller(tf, ti, dt, diffTime);
@@ -334,7 +335,6 @@ void correctOrientation(float tf) {
     startTime = micros();
    // Enes100.println(dt);
     //Enes100.println(P);
-    rotateOTV(P);
   }
   Enes100.println("I'm done rotating!!!!!! :DDDDDDDDDDDDDDD");
   setDrivePower(0,0,0); //stopotv();
