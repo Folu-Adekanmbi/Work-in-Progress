@@ -335,7 +335,7 @@ void correctOrientation(float tf) {
   float integral = 0;
 
   // New variables for stability check
-  const float angleThreshold = 0.01;
+  const float angleThreshold = 0.05;
   const unsigned long stableDuration = 0; // 75 ms in microseconds
   unsigned long stableStart = 0;
 
