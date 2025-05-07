@@ -436,22 +436,19 @@ if (check == true) {
 delay(1000); // Short delay to ensure multiple readings
 
 //Code to drive otv back to the limbo after mission indentification
-if (y < 1) {
+/*if (y < 1) {
     driveTo(0.35,0.68,-1.55);// moving away from wall to allow correct orientation
     delay(1000);
     correctOrientation(1.55); // turning the front of the OTV 
     driveTo(0.35, 2, 1.55); // to return the otv to the other edge of the arena
     delay(1000); //short delay before it begins strafing 
     driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
-}
-else {
-  driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
-  delay(1000);
-  //no need to correct orientation already at the edge of arena
-    driveTo(2.8,2,1.55); //strafe forward before going into limbo
-}
+}*/
+driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
+delay(1000);
+//no need to correct orientation already at the edge of arena
+driveTo(2.8,2,1.55); //strafe forward before going into limbo
 // Aligning to the front of the limbo
-
  // moving under Limbo
  delay(1000); // short delay before shifting to the front of the OTV
 driveTo(2.8,1.63,1.55); // fropm edge to the front of the middle of the limbo
