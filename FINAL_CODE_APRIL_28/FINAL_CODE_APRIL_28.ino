@@ -250,9 +250,9 @@ void fsr() {
 
 // Controls angular movement
 int pid_angular_controller(float setpoint, float pv, float previous_error, long diffTime, float *integral) {
-    float kp = 119.5;
+    float kp = 70;//119.5
     float ki = 0;
-    float kd = 49.5;  // Currently zero; increase if needed for damping
+    float kd = 0;  // Currently zero; increase if needed for damping49.5
 
     float error = normalizeAngle(setpoint - pv);
     float derivative = 0;
@@ -398,24 +398,24 @@ void mission() {
 if (y < 1) {
     correctOrientation(1.57); // might need to correct angle based on vision system numbers
     driveTo(0.35, 0.44, 1.57); // sets starting position
-    delay(100);
+    delay(1000);
     driveTo(0.35, 1.34, 1.57); // stops in front of payload
-    delay(100);
+    delay(1000);
     driveTo(0.35, 1.85, 1.57);// alligning payload to intake
-    delay(100);
+    delay(1000);
     setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
    setDrivePower(0,0,0); // stop otv
   } 
   else {
     correctOrientation(-1.57); // might need to correct angle
-    delay(100);
+    delay(1000);
     driveTo(0.35, 1.59, -1.57); // sets starting position
-    delay(100);
+    delay(1000);
      driveTo(0.35,0.68,-1.57);// stops in front of payload
-     delay(100);
+     delay(1000);
      driveTo(0.35, 0.13,-1.57);// alligning payload to intake
-     delay(100);
+     delay(1000);
      setDrivePower(1,0,0);//moving at full speed into payload
     delay(1500); //moves at top speed for 1.5 seconds into the wall
      setDrivePower(0,0,0); // stop otv
@@ -427,35 +427,35 @@ delay (1000); // delaying by a 1 second before fufilling mission objectives
 // Code to define weight
 chooseMaterial(scale.get_units(10));
 /*Enes100.println(scale.get_units(10));*/
-delay(100); // Short delay to ensure multiple readings
+delay(1000); // Short delay to ensure multiple readings
 
 // run material identification using fsr
 if (check == true) {
    fsr();
 }
-delay(100); // Short delay to ensure multiple readings
+delay(1000); // Short delay to ensure multiple readings
 
 //Code to drive otv back to the limbo after mission indentification
 if (y < 1) {
     driveTo(0.35,0.68,-1.55);// moving away from wall to allow correct orientation
-    delay(100);
+    delay(1000);
     correctOrientation(1.55); // turning the front of the OTV 
     driveTo(0.35, 2, 1.55); // to return the otv to the other edge of the arena
-    delay(100); //short delay before it begins strafing 
+    delay(1000); //short delay before it begins strafing 
     driveTo(2.8,2,1.55); //navigate forward before strafing into limbo
 }
 else {
   driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
-  delay(100);
+  delay(1000);
   //no need to correct orientation already at the edge of arena
     driveTo(2.8,2,1.55); //strafe forward before going into limbo
 }
 // Aligning to the front of the limbo
 
  // moving under Limbo
- delay(100); // short delay before shifting to the front of the OTV
+ delay(1000); // short delay before shifting to the front of the OTV
 driveTo(2.8,1.63,1.55); // fropm edge to the front of the middle of the limbo
-delay(100); // short delay before getting to goal zone
+delay(1000); // short delay before getting to goal zone
 driveTo(3.96,1.63,1.55); // to the goal zone. 
 
 }
