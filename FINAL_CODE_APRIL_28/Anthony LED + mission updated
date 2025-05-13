@@ -32,12 +32,12 @@ void setAllBlue() {
 
 void rainbowFlash() {
     while (true) { // Infinite loop
-        for(int j = 0; j < 256; j += 20) { // Adjust step size for flashing speed
+        for(int j = 0; j < 256; j += 1) { // Adjust step size for flashing speed
             for(int i = 0; i < strip.numPixels(); i++) {
                 strip.setPixelColor(i, strip.ColorHSV((j * 65536) / 256));
             }
             strip.show();
-            delay(100); // Adjust delay to control speed of the effect
+            delay(25); // Adjust delay to control speed of the effect
         }
     }
 }
@@ -120,9 +120,9 @@ void setMotorPower(int motor, float power) { //Input motor name either FL, FR, B
 
 void setDrivePower(float vx, float vy, float omega) { //given velotiy for x y and theta set drive power of each motor
   float frontLeft  = vx + vy + omega; //update after looking at wheel config
-  float frontRight = vx - vy - omega;
+  float frontRight = vx + vy - omega;
   float backLeft   = vx - vy + omega;
-  float backRight  = vx + vy - omega;
+  float backRight  = vx - vy - omega;
 
   // Normalize speeds but keep them proportional
   float maxMagnitude = max( 1.0, max(fabs(frontLeft), max(fabs(frontRight), max(fabs(backLeft), fabs(backRight)))));
@@ -277,9 +277,9 @@ void fsr() {
 
 // Controls angular movement
 int pid_angular_controller(float setpoint, float pv, float previous_error, long diffTime, float *integral) {
-    float kp = 70;//119.5
+    float kp = 119.5;//119.5
     float ki = 0;
-    float kd = 0;  // Currently zero; increase if needed for damping49.5
+    float kd = 49.5;  // Currently zero; increase if needed for damping49.5
 
     float error = normalizeAngle(setpoint - pv);
     float derivative = 0;
@@ -362,7 +362,7 @@ void correctOrientation(float tf) {
   float integral = 0;
 
   // New variables for stability check
-  const float angleThreshold = 0.05;
+  const float angleThreshold = 0.03;
   const unsigned long stableDuration = 0; // 75 ms in microseconds
   unsigned long stableStart = 0;
 
@@ -428,25 +428,29 @@ void mission() {
 //Start orientation and movement towards payload
 if (y < 1) {
     correctOrientation(1.57); // might need to correct angle based on vision system numbers
+    delay(1000);
     driveTo(0.35, 0.44, 1.57); // sets starting position
     delay(1000);
-    driveTo(0.35, 1.30, 1.57); // stops in front of payload
+    driveTo(0.35, 1.25, 1.57); // stops in front of payload
     delay(1000);
+    driveTo(0.35, 1.80, 1.57);// alligning payload to intake
   } 
   else {
     correctOrientation(-1.57); // might need to correct angle
     delay(1000);
     driveTo(0.35, 1.59, -1.57); // sets starting position
     delay(1000);
-     driveTo(0.35,0.60,-1.57);// stops in front of payload
+     driveTo(0.35,0.65,-1.57);// stops in front of payload
+     delay(1000);
+    driveTo(0.35, 0.18,-1.57);// alligning payload to intake
   }
-setDrivePower(0.5,0,0);
-delay(3000);
-setDrivePower(0,0,0)
-delay(100)
+setDrivePower(0.4,0,0);
+delay(1000);
+setDrivePower(0,0,0);
+delay(100);
 setDrivePower(-0.5,0,0);
-delay(250)
-setDrivePower(0,0,0)
+delay(250);
+setDrivePower(0,0,0);
 delay (1000); // delaying by a 1 second before fufilling mission objectives 
 
 // Determine material
@@ -464,31 +468,33 @@ else{
 // Code to define weight
 /*Enes100.println(scale.get_units(10));*/
 delay(1000); // Short delay to ensure multiple readings
-
-
 driveTo(0.35, 2, 1.55); // ensure it is at the very edge of the 
 delay(1000);
 //no need to correct orientation already at the edge of arena
-driveTo(2.8,2,1.55); //strafe forward before going into limbo
+driveTo(2.8,2,1.57); //strafe forward before going into limbo
 // Aligning to the front of the limbo
  // moving under Limbo
  delay(1000); // short delay before shifting to the front of the OTV
-driveTo(2.8,1.63,1.55); // fropm edge to the front of the middle of the limbo
+driveTo(2.8,1.63,1.57); // fropm edge to the front of the middle of the limbo
 delay(1000); // short delay before getting to goal zone
-driveTo(3.96,1.63,1.55); // to the goal zone. 
+driveTo(3.96,1.63,1.57); // to the goal zone. 
 chooseMaterial(scale.get_units(10));
 
 }
 
 void loop() {
-  if(Enes100.isVisible()){
-    setAllBlue()
-    mission();
-    delay(1000);
-    setDrivePower(0,0,1);
+    //  setAllBlue();
+    // correctOrientation(1.57);
     rainbowFlash();
-    delay(10000000000000);
-  }
+//  setDrivePower(0,1,0);
+  // if(Enes100.isVisible()){
+  //   //setAllBlue();
+  //   mission();
+  //   delay(1000);
+  //   setDrivePower(0,0,1);
+  //   rainbowFlash();
+  //   delay(10000000000000);
+  // }
   
 
 }
